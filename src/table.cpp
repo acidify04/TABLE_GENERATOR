@@ -17,26 +17,20 @@ int Table::get_total_grade() {
     return total_grade;
 }
 
-void Table::remove_course(Course &course)
-{
+void Table::remove_course(Course &course) {
     auto toRemove = find(courses.begin(), courses.end(), course);
-    if (toRemove != courses.end())
-    {
+    if (toRemove != courses.end()) {
         courses.erase(toRemove);
-    }
-    else
-    {
+    } else {
         cerr << "Error: There is no course." << endl;
     }
 }
 
-bool Table::insert_course(Course &course)
-{
+bool Table::insert_course(Course &course) {
     try {
         courses.push_back(course);
     }
-    catch (const exception &e)
-    {
+    catch (const exception &e) {
         return false;
     }
     return true;   

@@ -6,13 +6,11 @@
 
 using namespace std;
 
-void TableDatabase::insert(Table &table)
-{	
+void TableDatabase::insert(Table &table) {	
 	tables.push_back(table);
 }
 
-void TableDatabase::update(Table &table)
-{
+void TableDatabase::update(Table &table) {
     auto toUpdate = find_if(tables.begin(), tables.end(), [&table](const Table &t) { 
             return t.get_id() == table.get_id();
     });
@@ -34,6 +32,14 @@ void TableDatabase::remove(int id) {
     if (toRemove != tables.end()) {
         tables.erase(toRemove);
     }
+}
+
+void TableDatabase::load() {
+
+}
+
+void TableDatabase::save() {
+
 }
 
 // getter
