@@ -18,6 +18,13 @@ class Table
     Table(std::string &string);
     ~Table();
 
+    Semester get_semester();
+    int get_year();
+    vector<Course> get_courses();
+    string get_name();
+    int get_user_id();
+    int get_id();
+
   private:
     Semester semester;
     int year;

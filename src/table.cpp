@@ -73,3 +73,14 @@ bool Table::is_satisfy(TableQuery tableQuery)
     return true;
 }
 
+string Table::encode()
+{
+
+}
+
+Table::Table(string &string)
+{
+
+}
+
+Table::~Table() { }
