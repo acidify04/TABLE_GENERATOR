@@ -49,38 +49,57 @@ vector<Course> Table::get_course()
     return courses;
 }
 
-bool Table::is_satisfy(TableQuery tableQuery)
-{
-    if (semester != tableQuery.semester)
-    {
+bool Table::is_satisfy(TableQuery tableQuery){
+    if (semester != tableQuery.semester) {
         return false;
     }
 
-    if (year != tableQuery.year)
-    {
+    if (year != tableQuery.year) {
         return false;
     }
 
-    if (name != tableQuery.name)
-    {
+    if (name != tableQuery.name) {
         return false;    
     }
 
-    if (user_id != tableQuery.user_id)
-    {
+    if (user_id != tableQuery.user_id) {
         return false;
     }
     return true;
 }
 
-string Table::encode()
-{
+string Table::encode(){
 
 }
 
-Table::Table(string &string)
-{
+Table::Table(string &string){
 
 }
 
 Table::~Table() { }
+
+// getter, setter
+
+Semester Table::get_semester() {
+    return semester;
+}
+
+int Table::get_year() {
+    return year;
+}
+
+vector<Course> Table::get_courses() {
+    return courses;
+}
+
+string Table::get_name() {
+    return name;
+}
+
+int Table::get_user_id() {
+    return user_id;
+}
+
+int Table::get_id() const {
+    return id;
+}

@@ -15,6 +15,8 @@ class TableDatabase
     void load();
     void save();
 
+    vector<Table> get_tables() const;
+
   private:
     std::vector<Table> tables;
 };

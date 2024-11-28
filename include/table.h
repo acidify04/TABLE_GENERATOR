@@ -23,7 +23,7 @@ class Table
     vector<Course> get_courses();
     string get_name();
     int get_user_id();
-    int get_id();
+    int get_id() const;
 
   private:
     Semester semester;
