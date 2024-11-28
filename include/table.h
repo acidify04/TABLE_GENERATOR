@@ -12,17 +12,17 @@ class Table
     int get_total_grade();
     void remove_course(Course &course);
     bool insert_course(Course &course);
-    std::vector<Course> get_course();
-    bool is_satisfy(TableQuery tableQuery);
+    std::vector<Course> get_course() const;
+    bool is_satisfy(TableQuery tableQuery) const;
     std::string encode();
     Table(std::string &string);
     ~Table();
 
-    Semester get_semester();
-    int get_year();
-    vector<Course> get_courses();
-    string get_name();
-    int get_user_id();
+    Semester get_semester() const;
+    int get_year() const;
+    const vector<Course>& get_courses() const;
+    string get_name() const;
+    int get_user_id() const;
     int get_id() const;
 
   private:

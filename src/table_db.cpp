@@ -35,3 +35,9 @@ void TableDatabase::remove(int id) {
         tables.erase(toRemove);
     }
 }
+
+// getter
+
+vector<Table> TableDatabase::get_tables() const {
+    return tables;
+}

@@ -6,13 +6,11 @@
 
 using namespace std;
 
-int Table::get_total_grade()
-{
+int Table::get_total_grade() {
     int total_grade = 0;
     vector<Course>::iterator p;
 
-    for (p = courses.begin(); p != courses.end(); ++p)
-    {   
+    for (p = courses.begin(); p != courses.end(); ++p) {   
         total_grade += p->get_grade();
     }
 
@@ -44,12 +42,11 @@ bool Table::insert_course(Course &course)
     return true;   
 }
 
-vector<Course> Table::get_course()
-{
+vector<Course> Table::get_course() const {
     return courses;
 }
 
-bool Table::is_satisfy(TableQuery tableQuery){
+bool Table::is_satisfy(TableQuery tableQuery) const {
     if (semester != tableQuery.semester) {
         return false;
     }
@@ -78,25 +75,25 @@ Table::Table(string &string){
 
 Table::~Table() { }
 
-// getter, setter
+// getter
 
-Semester Table::get_semester() {
+Semester Table::get_semester() const {
     return semester;
 }
 
-int Table::get_year() {
+int Table::get_year() const {
     return year;
 }
 
-vector<Course> Table::get_courses() {
+const vector<Course>& Table::get_courses() const {
     return courses;
 }
 
-string Table::get_name() {
+string Table::get_name() const {
     return name;
 }
 
-int Table::get_user_id() {
+int Table::get_user_id() const {
     return user_id;
 }
 
