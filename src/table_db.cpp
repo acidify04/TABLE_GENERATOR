@@ -6,6 +6,10 @@
 
 using namespace std;
 
+vector<Table> TableDatabase::query(TableQuery tableQuery) {
+
+}
+
 void TableDatabase::insert(Table &table) {	
 	tables.push_back(table);
 }
