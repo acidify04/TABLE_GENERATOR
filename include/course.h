@@ -3,6 +3,7 @@
 
 #include <string>
 #include <set>
+#include <optional>
 
 typedef int Time;
 
@@ -54,6 +55,7 @@ int year;
 Semester semester;
 bool english_a;
 std::string professor;
+std::set<Department> departments;
 std::vector<CourseTime> times;
 
 public:
@@ -65,10 +67,30 @@ public:
     int get_grade() const;
     std::string get_name() const;
     std::string get_professor() const;
+    std::set<Department> get_departments() const;
     CourseType get_type() const;
     Semester get_semester() const;
     int get_year() const;
     bool is_english_a() const;
 };
 
+// if fail to decode, error will be thrown
+CourseTime decode_coursetime(const std::string&);
+std::string encode_coursetime(const CourseTime&);
+
+// if fail to decode, error will be thrown
+Semester decode_semester(const std::string&);
+std::string encode_semester(const CourseTime&);
+
+// if fail to decode, error will be thrown
+Weekday decode_weekday(const std::string&);
+std::string encode_weekday(Weekday);
+
+// if fail to decode, error will be thrown
+CourseType decode_coursetype(const std::string&);
+std::string encode_coursetype(const CourseType);
+
+// if fail to decode, error will be thrown
+Department decode_department(const std::string&);
+std::string encode_department(const Department);
 #endif
