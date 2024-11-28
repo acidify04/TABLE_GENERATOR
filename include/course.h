@@ -80,7 +80,7 @@ std::string encode_coursetime(const CourseTime&);
 
 // if fail to decode, error will be thrown
 Semester decode_semester(const std::string&);
-std::string encode_semester(const CourseTime&);
+std::string encode_semester(Semester);
 
 // if fail to decode, error will be thrown
 Weekday decode_weekday(const std::string&);

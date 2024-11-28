@@ -251,20 +251,22 @@ CourseType decode_coursetype(const std::string &input)
     case 3:
         return CourseType::CoreChallenge;
     case 4:
-        return CourseType::CoreTrust;
+        return CourseType::CoreConvergence;
     case 5:
-        return CourseType::ElectiveCommunication;
+        return CourseType::CoreTrust;
     case 6:
-        return CourseType::ElectiveCreativity;
+        return CourseType::ElectiveCommunication;
     case 7:
-        return CourseType::ElectiveChallenge;
+        return CourseType::ElectiveCreativity;
     case 8:
-        return CourseType::ElectiveConvergence;
+        return CourseType::ElectiveChallenge;
     case 9:
-        return CourseType::Major;
+        return CourseType::ElectiveConvergence;
     case 10:
-        return CourseType::MajorRequired;
+        return CourseType::Major;
     case 11:
+        return CourseType::MajorRequired;
+    case 12:
         return CourseType::MajorFundamental;
     default:
         throw std::exception(); // Invalid semester value.
@@ -281,5 +283,117 @@ Department decode_department(const std::string &input)
         return Department::ComputerScience;
     default:
         throw std::exception(); // Invalid semester value.
+    }
+}
+
+// - Encoder
+
+std::string Course::encode() const
+{
+    std::string raw_value;
+    raw_value.append("<course>");
+    raw_value.append("<id>" + std::to_string(id) + "</id>");
+    raw_value.append("<type>" + encode_coursetype(type) + "</type>");
+    raw_value.append("<year>" + std::to_string(year) + "</year>");
+    raw_value.append("<semester>" + encode_semester(semester) + "</semester>");
+    if (english_a)
+        raw_value.append("<english>1</english>");
+    else
+        raw_value.append("<english>0</english>");
+    if (professor.size() > 0)
+        raw_value.append("<professor>" + professor + "</professor>");
+    for (auto department : departments)
+        raw_value.append("<department>" + encode_department(department) + "</department>");
+    for (auto time : times)
+        raw_value.append("<time>" + encode_coursetime(time) + "</time>");
+    raw_value.append("</course>");
+    return raw_value;
+}
+
+std::string encode_coursetime(const CourseTime &time)
+{
+    std::string raw_value;
+    raw_value.append("<weekday>" + encode_weekday(time.weekday) + "</weekday>");
+    raw_value.append("<t>" + std::to_string(time.time) + "</t>");
+    raw_value.append("<room>" + time.room + "</room>");
+    raw_value.append("<building>" + time.building + "</building>");
+    return raw_value;
+}
+
+std::string encode_semester(Semester semester)
+{
+    switch (semester)
+    {
+    case Semester::Spring:
+        return "0";
+    case Semester::Summer:
+        return "1";
+    case Semester::Fall:
+        return "2";
+    case Semester::Winter:
+        return "3";
+    }
+}
+
+std::string encode_weekday(Weekday weekday)
+{
+    switch (weekday)
+    {
+    case Weekday::Sun:
+        return "0";
+    case Weekday::Mon:
+        return "1";
+    case Weekday::Tue:
+        return "2";
+    case Weekday::Wed:
+        return "3";
+    case Weekday::Thu:
+        return "4";
+    case Weekday::Fri:
+        return "5";
+    case Weekday::Sat:
+        return "6";
+    }
+}
+
+std::string encode_coursetype(CourseType type)
+{
+    switch (type)
+    {
+    case CourseType::General_Education:
+        return "0";
+    case CourseType::CoreCommunication:
+        return "1";
+    case CourseType::CoreCreativity:
+        return "2";
+    case CourseType::CoreChallenge:
+        return "3";
+    case CourseType::CoreConvergence:
+        return "4";
+    case CourseType::CoreTrust:
+        return "5";
+    case CourseType::ElectiveCommunication:
+        return "6";
+    case CourseType::ElectiveCreativity:
+        return "7";
+    case CourseType::ElectiveChallenge:
+        return "8";
+    case CourseType::ElectiveConvergence:
+        return "9";
+    case CourseType::Major:
+        return "10";
+    case CourseType::MajorRequired:
+        return "11";
+    case CourseType::MajorFundamental:
+        return "12";
+    }
+}
+
+std::string encode_department(Department department)
+{
+    switch (department)
+    {
+    case Department::ComputerScience:
+        return "0";
     }
 }
