@@ -22,7 +22,7 @@ void Table::remove_course(Course &course) {
     if (toRemove != courses.end()) {
         courses.erase(toRemove);
     } else {
-        cerr << "Error: There is no course." << endl;
+        cerr << "선택한 강의 번호가 시간표에 없습니다. 다시 선택해주세요." << endl;
     }
 }
 

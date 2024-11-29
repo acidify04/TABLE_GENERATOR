@@ -24,7 +24,7 @@ void TableDatabase::update(Table &table) {
         tables.push_back(table);
     }
     else {
-        cerr << "Error: There is no table." << endl;
+        cerr << "조건에 맞는 시간표가 없습니다. 다시 검색해주세요." << endl;
     }
 }
 
