@@ -20,7 +20,7 @@ class Table
 
     Semester get_semester() const;
     int get_year() const;
-    vector<Course>& get_courses() const;
+    //vector<Course>& get_courses() const;
     string get_name() const;
     int get_user_id() const;
     int get_id() const;

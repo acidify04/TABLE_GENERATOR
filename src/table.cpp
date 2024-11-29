@@ -144,8 +144,6 @@ Table::Table(string &str){
     }
 }
 
-
-
 Table::~Table() { }
 
 // getter
@@ -156,10 +154,6 @@ Semester Table::get_semester() const {
 
 int Table::get_year() const {
     return year;
-}
-
-vector<Course>& Table::get_courses() const {
-    return courses;
 }
 
 string Table::get_name() const {
