@@ -93,62 +93,58 @@ string encode_semester(Semester semester) {
     }
 } 
 
-Table::Table(string &str){
-    /*size_t id_start = str.find("<id>") + 4;
-    size_t id_end = str.find("</id>");
-
-    if (id_start != string::npos && id_end != string::npos && id_start != id_end) {
-        id = stoi(str.substr(id_start, id_end - id_start));
-    }
-
-    size_t user_id_start = str.find("<user_id>") + 9;
-    size_t user_id_end = str.find("</user_id>");
-
-    if (user_id_start != string::npos && user_id_end != string::npos && user_id_start != user_id_end) {
-        user_id = stoi(str.substr(user_id_start, user_id_end - user_id_start));
-    }
-
-    size_t year_start = str.find("<year>") + 6;
-    size_t year_end = str.find("</year>");
-
-    if (year_start != string::npos && year_end != string::npos && year_start != year_end) {
-        year = stoi(str.substr(year_start, year_end - year_start));
-    }
-
-    size_t sem_start = str.find("<semester>") + 10;
-    size_t sem_end = str.find("</semester>");
-
-    if (sem_start != string::npos && sem_end != string::npos && sem_start != sem_end) {
-        semester = decode_semester(str.substr(sem_start, sem_end - sem_start));
-    }
-
-    size_t name_start = str.find("<name>") + 6;
-    size_t name_end = str.find("</name>");
-
-    if (name_start != string::npos && name_end != string::npos && name_start != name_end)
-    {
-        name = str.substr(name_start, name_end - name_start);
-    }*/
-    
-    ParseResult result = parse_tag(str.begin(), str.end());
-
-}
-
 // string to Semester
-Semester decode_semester(string str) {
-    if (str == "Spring") {
+Semester decode_semester(string str)
+{
+    if (str == "Spring")
+    {
         return Semester::Spring;
     }
-    else if (str == "Summer") {
+    else if (str == "Summer")
+    {
         return Semester::Summer;
     }
-    else if (str == "Fall") {
+    else if (str == "Fall")
+    {
         return Semester::Fall;
     }
-    else if (str == "Winter") {
+    else if (str == "Winter")
+    {
         return Semester::Winter;
     }
 } 
+
+Table::Table(string &str){
+    ParseResult result;
+    ParseResult course_result;
+    auto it = str.begin();
+    while (it != str.end()) {
+        result = parse_tag(it, str.end());
+        if (result.is_success) {
+            if (result.tag == "id") {
+                id = stoi(result.value);
+            }
+            else if (result.tag == "name") {
+                name = stoi(result.value);
+            }
+            else if (result.tag == "user_id") {
+                user_id = stoi(result.value);
+            }
+            else if (result.tag == "year") {
+                year = stoi(result.value);
+            }
+            else if (result.tag == "Semester") {
+                semester = decode_semester(result.value);
+            }
+            else if (result.tag == "Course") {
+                Course course(result.value);
+                courses.push_back(course);
+            }
+        }
+    }
+}
+
+
 
 Table::~Table() { }
 
@@ -162,7 +158,7 @@ int Table::get_year() const {
     return year;
 }
 
-const vector<Course>& Table::get_courses() const {
+vector<Course>& Table::get_courses() const {
     return courses;
 }
 
@@ -181,18 +177,20 @@ int Table::get_id() const {
 struct ParseResult
 {
     bool is_success;
-    std::string tag;
-    std::string value;
+    bool is_course;
+    string tag;
+    string value;
 };
 
 // Parse tag and tag's contents
-ParseResult parse_tag(std::string::const_iterator &pt, const std::string::const_iterator &end)
+ParseResult parse_tag(string::const_iterator &pt, const string::const_iterator &end)
 {
     ParseResult result;
 
     std::string target_token;
     std::string temp_token;
     bool is_success = false;
+    bool is_course = false;
     bool is_token_content = false;
     bool is_token = false;
     bool is_closed = false;
@@ -237,5 +235,5 @@ ParseResult parse_tag(std::string::const_iterator &pt, const std::string::const_
             value_str.push_back(*pt);
     }
 
-    return ParseResult{is_success, target_token, value_str};
+    return ParseResult{is_success, is_course, target_token, value_str};
 }
