@@ -60,7 +60,36 @@ bool Table::is_satisfy(TableQuery tableQuery) const {
 }
 
 string Table::encode(){
+    string raw_value;
+    raw_value.append("<Table>");
+    raw_value.append("<id>" + to_string(id) + "</id>");
+    raw_value.append("<user_id>" + to_string(user_id) + "</user_id>");
+    raw_value.append("<year>" + to_string(year) + "</year>");
+    raw_value.append("<semester>" + encode_semester(semester) + "</semester>");
+    raw_value.append("<name>" + name + "</name>");
 
+    for (auto course : courses) {
+        raw_value.append("<course>" + course.encode() + "</course>");
+    }
+    raw_value.append("</Table>");
+    return raw_value;
+}
+
+string encode_semester(Semester semester) {
+    if (semester == Semester::Spring) {
+        return "Spring";
+    }
+    else if (semester == Semester::Summer) {
+        return "Summer";
+    }
+    else if (semester == Semester::Fall)
+    {
+        return "Fall";
+    }
+    else if (semester == Semester::Winter)
+    {
+        return "Winter";
+    }
 }
 
 Table::Table(string &string){
