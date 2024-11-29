@@ -37,9 +37,14 @@ void CourseDatabase::load_courses()
     {
         try
         {
-            Course course(line_str);
-            int id = course.get_id();
-            courses[id] = course;
+            std::string::const_iterator pt = line_str.begin();
+            ParseResult result = parse_tag(pt, line_str.end());
+            if (result.tag == "course")
+            {
+                Course course(result.value);
+                int id = course.get_id();
+                courses[id] = course;
+            }
         }
         catch (const std::exception &e)
         {
@@ -144,7 +149,6 @@ void CourseDatabase::indexing()
         raw_value.append("</courses>");
         raw_value.append("</index>");
         file << raw_value << std::endl;
-        std::cout << raw_value << std::endl;
         raw_value.clear();
     }
 
