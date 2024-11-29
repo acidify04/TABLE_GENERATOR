@@ -75,6 +75,7 @@ string Table::encode(){
     return raw_value;
 }
 
+// semester to string
 string encode_semester(Semester semester) {
     if (semester == Semester::Spring) {
         return "Spring";
@@ -90,11 +91,64 @@ string encode_semester(Semester semester) {
     {
         return "Winter";
     }
+} 
+
+Table::Table(string &str){
+    /*size_t id_start = str.find("<id>") + 4;
+    size_t id_end = str.find("</id>");
+
+    if (id_start != string::npos && id_end != string::npos && id_start != id_end) {
+        id = stoi(str.substr(id_start, id_end - id_start));
+    }
+
+    size_t user_id_start = str.find("<user_id>") + 9;
+    size_t user_id_end = str.find("</user_id>");
+
+    if (user_id_start != string::npos && user_id_end != string::npos && user_id_start != user_id_end) {
+        user_id = stoi(str.substr(user_id_start, user_id_end - user_id_start));
+    }
+
+    size_t year_start = str.find("<year>") + 6;
+    size_t year_end = str.find("</year>");
+
+    if (year_start != string::npos && year_end != string::npos && year_start != year_end) {
+        year = stoi(str.substr(year_start, year_end - year_start));
+    }
+
+    size_t sem_start = str.find("<semester>") + 10;
+    size_t sem_end = str.find("</semester>");
+
+    if (sem_start != string::npos && sem_end != string::npos && sem_start != sem_end) {
+        semester = decode_semester(str.substr(sem_start, sem_end - sem_start));
+    }
+
+    size_t name_start = str.find("<name>") + 6;
+    size_t name_end = str.find("</name>");
+
+    if (name_start != string::npos && name_end != string::npos && name_start != name_end)
+    {
+        name = str.substr(name_start, name_end - name_start);
+    }*/
+    
+    ParseResult result = parse_tag(str.begin(), str.end());
+
 }
 
-Table::Table(string &string){
-
-}
+// string to Semester
+Semester decode_semester(string str) {
+    if (str == "Spring") {
+        return Semester::Spring;
+    }
+    else if (str == "Summer") {
+        return Semester::Summer;
+    }
+    else if (str == "Fall") {
+        return Semester::Fall;
+    }
+    else if (str == "Winter") {
+        return Semester::Winter;
+    }
+} 
 
 Table::~Table() { }
 
@@ -122,4 +176,66 @@ int Table::get_user_id() const {
 
 int Table::get_id() const {
     return id;
+}
+
+struct ParseResult
+{
+    bool is_success;
+    std::string tag;
+    std::string value;
+};
+
+// Parse tag and tag's contents
+ParseResult parse_tag(std::string::const_iterator &pt, const std::string::const_iterator &end)
+{
+    ParseResult result;
+
+    std::string target_token;
+    std::string temp_token;
+    bool is_success = false;
+    bool is_token_content = false;
+    bool is_token = false;
+    bool is_closed = false;
+    std::string value_str;
+
+    for (; pt != end; ++pt)
+    {
+        if (is_token)
+        {
+            if (*pt == '/')
+                is_closed = true;
+            else if (*pt == '>')
+            {
+                bool is_target_exit = target_token.size() > 0;
+                if (is_closed)
+                {
+                    if (is_target_exit && target_token == temp_token)
+                    {
+                        is_success = true;
+                        break;
+                    }
+                    else
+                        value_str.append("</" + temp_token + ">");
+                    is_closed = false;
+                }
+                else if (!is_target_exit)
+                {
+                    target_token = temp_token;
+                    is_token_content = true;
+                }
+                else
+                    value_str.append("<" + temp_token + ">");
+                is_token = false;
+                temp_token.clear();
+            }
+            else
+                temp_token.push_back(*pt);
+        }
+        else if (*pt == '<')
+            is_token = true;
+        else if (*pt != '\n' && is_token_content)
+            value_str.push_back(*pt);
+    }
+
+    return ParseResult{is_success, target_token, value_str};
 }

@@ -15,7 +15,7 @@ class Table
     std::vector<Course> get_course() const;
     bool is_satisfy(TableQuery tableQuery) const;
     std::string encode();
-    Table(std::string &string);
+    Table(std::string &str);
     ~Table();
 
     Semester get_semester() const;
@@ -33,6 +33,5 @@ class Table
     int user_id;
     int id;
 };
-
 
 #endif
