@@ -45,6 +45,8 @@ struct CourseTime
     Time time;
     std::string room;
     std::string building;
+
+    bool operator==(const CourseTime&) const;
 };
 
 class Course {
@@ -59,12 +61,15 @@ std::set<Department> departments;
 std::vector<CourseTime> times;
 
 public:
+    Course();
     // Decode from string
     Course(const std::string&);
     // Encode to string
     std::string encode() const;
 
+    int get_id() const;
     int get_grade() const;
+    std::vector<CourseTime> get_times() const;
     std::string get_name() const;
     std::string get_professor() const;
     std::set<Department> get_departments() const;
@@ -72,6 +77,8 @@ public:
     Semester get_semester() const;
     int get_year() const;
     bool is_english_a() const;
+
+    bool operator==(const Course&) const;
 };
 
 // if fail to decode, error will be thrown

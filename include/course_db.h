@@ -6,6 +6,10 @@
 #include <iostream>
 #include "course.h"
 
+typedef std::set<const Course*> Courses;
+
+std::set<std::string> seperate_str(std::string::iterator, std::string::iterator, int);
+
 struct CourseQuery
 {
     // Semester is required.
@@ -21,17 +25,36 @@ struct CourseQuery
     // Query by departments. if empty, all department's courses will be quried.
     std::set<Department> departments;
     // Query by professor. if empty, all courses will be quried.
-    std::string professor;
+    std::set<std::string> professors;
+};
+
+struct IndexKey
+{
+    int year;
+    Semester semester;
+    Weekday weekday;
+    Time time;
+
+    bool operator==(const IndexKey&) const;
+};
+
+struct IndexKeyHash { // for using index key in unordered map's key.
+    std::size_t operator()(const IndexKey&) const;
 };
 
 class CourseDatabase
 {
-std::vector<Course> courses;
+std::unordered_map<int, Course> courses;
+std::unordered_map<IndexKey, Courses, IndexKeyHash> indexed_courses;
 
 public:
+CourseDatabase();
 std::vector<Course> query(CourseQuery) const;
+void load();
 
 private:
-void indexing_by_name();
+void load_courses();
+void load_index();
+void indexing();
 };
 #endif
