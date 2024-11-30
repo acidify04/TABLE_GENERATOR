@@ -13,7 +13,7 @@ file(GLOB SOURCE_FILES
     src/*/*.cpp
 )
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} "include/table.h" "include/table_db.h" "src/table.cpp" "src/table_db.cpp")
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} "include/table.h" "include/table_db.h" "src/table_db/table.cpp" "src/table_db/table_db.cpp")
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 find_program(CLANG_FORMAT "clang-format")

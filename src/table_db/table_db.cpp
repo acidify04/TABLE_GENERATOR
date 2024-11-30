@@ -18,14 +18,6 @@ vector<Table> TableDatabase::query(TableQuery tableQuery) {
         copy_if(result.begin(), result.end(), back_inserter(result),
                 [&](const Table &table) { return table.get_name() == tableQuery.name; });
     }
-    if (!tableQuery.user_id.empty()) {
-        copy_if(result.begin(), result.end(), back_inserter(result),
-                [&](const Table &table) { return table.get_id() == stoi(tableQuery.id); });
-    }
-    /*if (!tableQuery.department.empty()) {
-        copy_if(result.begin(), result.end(), back_inserter(result),
-                [&](const Table &table) { return table.get_dep() == tableQuery.name; });
-    }*/
     if (!tableQuery.semester.empty()) {
         copy_if(result.begin(), result.end(), back_inserter(result),
                 [&](const Table &table) { return table.get_semester() == decode_semester(tableQuery.semester); });
@@ -122,7 +114,7 @@ void TableDatabase::load() {
                     }
                 }
                 index++;
-
+                // TODO: course 읽어오기
             }
         }
     }
