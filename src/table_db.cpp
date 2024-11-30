@@ -8,7 +8,8 @@
 using namespace std;
 
 vector<Table> TableDatabase::query(TableQuery tableQuery) {
-
+    vector<Table> result;
+    if (tableQuery.id)
 }
 
 void TableDatabase::insert(Table &table) {	
@@ -63,7 +64,9 @@ void TableDatabase::save() {
         for (Table table : tables) {
             file << "<Table " << table_index << ">\n";
             file << "- - - - - - - - - - - - - - - - - - - - - - - - - - - -\n";
-            file << table.get_year() << " " << encode_semester(table.get_semester()) << " " << table.get_name() << "\n";
+            file << table.get_id() << "\n";
+            file << table.get_year() << " " << encode_semester(table.get_semester()) << "\n";
+            file << table.get_user_id() << " " << table.get_name() << "\n";
 
             for (Course course : table.get_course()) {
                 file << "- Course " << course_index << "\n";

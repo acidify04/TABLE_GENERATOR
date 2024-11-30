@@ -171,7 +171,6 @@ int Table::get_id() const {
 struct ParseResult
 {
     bool is_success;
-    bool is_course;
     string tag;
     string value;
 };
@@ -229,5 +228,5 @@ ParseResult parse_tag(string::const_iterator &pt, const string::const_iterator &
             value_str.push_back(*pt);
     }
 
-    return ParseResult{is_success, is_course, target_token, value_str};
+    return ParseResult{is_success, target_token, value_str};
 }

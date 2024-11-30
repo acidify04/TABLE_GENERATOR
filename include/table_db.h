@@ -23,6 +23,8 @@ class TableDatabase
 
 struct TableQuery
 {
+    int id;
+    Department department;
     Semester semester;
     int year;
     std::string name;
