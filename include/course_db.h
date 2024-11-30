@@ -28,24 +28,25 @@ struct CourseQuery
     std::set<std::string> professors;
 };
 
-struct IndexKey
+struct DateIndexKey
 {
     int year;
     Semester semester;
     Weekday weekday;
     Time time;
 
-    bool operator==(const IndexKey&) const;
+    bool operator==(const DateIndexKey&) const;
 };
 
-struct IndexKeyHash { // for using index key in unordered map's key.
-    std::size_t operator()(const IndexKey&) const;
+struct DateIndexKeyHash { // for using index key in unordered map's key.
+    std::size_t operator()(const DateIndexKey&) const;
 };
 
 class CourseDatabase
 {
 std::unordered_map<int, Course> courses;
-std::unordered_map<IndexKey, Courses, IndexKeyHash> indexed_courses;
+std::unordered_map<DateIndexKey, Courses, DateIndexKeyHash> date_index;
+std::unordered_map<std::string, Courses> name_index;
 
 public:
 CourseDatabase();
@@ -54,7 +55,9 @@ void load();
 
 private:
 void load_courses();
-void load_index();
-void indexing();
+void load_date_index();
+void indexing_by_date();
+void load_name_index();
+void indexing_by_name();
 };
 #endif
