@@ -98,6 +98,8 @@ void CourseDatabase::load_index()
                     key.semester = decode_semester(property.value);
                 else if (property.tag == "time")
                     key.time = std::stoi(property.value);
+                else if (property.tag == "weekday")
+                    key.weekday = decode_weekday(property.value);
                 else if (property.tag == "courses")
                 {
                     std::string ids = property.value;
@@ -113,7 +115,7 @@ void CourseDatabase::load_index()
                     }
                 }
             }
-            indexed_courses[key] = course_ptrs;
+            indexed_courses[key].insert(course_ptrs.begin(), course_ptrs.end());
         }
     }
 
