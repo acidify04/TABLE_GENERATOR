@@ -229,10 +229,12 @@ CourseType decode_coursetype(const std::string &input)
     case 9:
         return CourseType::ElectiveConvergence;
     case 10:
-        return CourseType::Major;
+        return CourseType::ElectiveTrust;
     case 11:
-        return CourseType::MajorRequired;
+        return CourseType::Major;
     case 12:
+        return CourseType::MajorRequired;
+    case 13:
         return CourseType::MajorFundamental;
     default:
         throw std::exception(); // Invalid semester value.
@@ -346,12 +348,14 @@ std::string encode_coursetype(CourseType type)
         return "8";
     case CourseType::ElectiveConvergence:
         return "9";
-    case CourseType::Major:
+    case CourseType::ElectiveTrust:
         return "10";
-    case CourseType::MajorRequired:
+    case CourseType::Major:
         return "11";
-    case CourseType::MajorFundamental:
+    case CourseType::MajorRequired:
         return "12";
+    case CourseType::MajorFundamental:
+        return "13";
     }
 }
 

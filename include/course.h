@@ -24,6 +24,7 @@ enum class CourseType
     ElectiveCreativity,
     ElectiveChallenge,
     ElectiveConvergence,
+    ElectiveTrust,
     Major,
     MajorRequired,
     MajorFundamental
