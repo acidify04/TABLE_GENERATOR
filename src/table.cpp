@@ -41,11 +41,11 @@ vector<Course> Table::get_course() const {
 }
 
 bool Table::is_satisfy(TableQuery tableQuery) const {
-    if (semester != tableQuery.semester) {
+    if (semester != decode_semester(tableQuery.semester)) {
         return false;
     }
 
-    if (year != tableQuery.year) {
+    if (year != stoi(tableQuery.year)) {
         return false;
     }
 
@@ -53,7 +53,7 @@ bool Table::is_satisfy(TableQuery tableQuery) const {
         return false;    
     }
 
-    if (user_id != tableQuery.user_id) {
+    if (user_id != stoi(tableQuery.user_id)) {
         return false;
     }
     return true;
@@ -142,6 +142,16 @@ Table::Table(string &str){
             }
         }
     }
+}
+
+// AllArgsConstructor
+Table::Table(int iid, int iuser_id, std::string iname, std::vector<Course> icourses, int iyear, Semester isemester) {
+    id = iid;
+    user_id = iuser_id;
+    name = iname;
+    courses = icourses;
+    year = iyear;
+    semester = isemester;
 }
 
 Table::~Table() { }
