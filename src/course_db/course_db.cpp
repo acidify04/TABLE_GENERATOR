@@ -159,26 +159,31 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
 {
     Courses matched_courses;
 
-    // check department condition
-    for (const auto &index : indexed_courses)
+    std::set<Weekday> week_query;
+    std::set<Time> time_query;
+
+    if (condition.weekdays.empty())
+        week_query = {Weekday::Sun, Weekday::Mon, Weekday::Tue, Weekday::Wed, Weekday::Thu, Weekday::Fri, Weekday::Sat};
+    else
+        week_query = condition.weekdays;
+
+    if (condition.times.empty())
+        time_query = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    else
+        time_query = condition.times;
+
+    for (auto time : time_query)
     {
-        const IndexKey &key = index.first;
-        if (key.semester != condition.semester || key.year != condition.year)
-            continue;
-
-        bool is_matched = true;
-
-        if (!condition.times.empty())
-            is_matched = is_matched && condition.times.count(key.time);
-
-        if (!condition.weekdays.empty())
-            is_matched = is_matched && condition.weekdays.count(key.weekday);
-
-        if (is_matched)
-            matched_courses.insert(index.second.begin(), index.second.end());
+        for (auto week : week_query)
+        {
+            const IndexKey &key = {condition.year, condition.semester, week, time};
+            if (indexed_courses.count(key) > 0)
+                matched_courses.insert(indexed_courses.at(key).begin(), indexed_courses.at(key).end());
+        }
     }
 
     Courses unmatched_courses;
+
     for (const auto course_ptr : matched_courses)
     {
         bool is_matched = true;
@@ -210,13 +215,10 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
         // name 설정
     }
 
-    matched_courses.extract(unmatched_courses.begin());
-
     std::vector<Course> result;
     for (auto course_ptr : matched_courses)
-    {
-        result.push_back(*course_ptr);
-    }
+        if (unmatched_courses.count(course_ptr) == 0)
+            result.push_back(*course_ptr);
 
     return result;
 }

@@ -81,6 +81,7 @@ Course Format
     <name>string</name>
     <professor>string</professor>
     <type>integer</type>
+    <year>integer</year>
     <semester>integer</semester>
     <english>integer</english>
     <professor>string</professor>
