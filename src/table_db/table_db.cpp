@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "table_db.h"
+#include "parser.h"
 
 using namespace std;
 
@@ -63,65 +64,25 @@ void TableDatabase::load() {
     bool isCourse = false;
     int index = 0;
 
-    int tableId;
-    int year;
-    Semester semester;
-    int user_id;
-    string name;
+    size_t current = 0;
 
     if (file.is_open()) {
         while (getline(file, line)) {
-            if (line._Starts_with("<Table ")) {
-                isTable = true;
+            try {
+                ParseResult result = parse_tag(line.begin(), line.end());
+                if (result.tag == "table") {
+                    Table table(result.value);
+                    tables.push_back(table);
+                }
             }
-            else if (isTable) {
-                if (index == 0) {
-                    tableId = stoi(line);
-                }
-                else if (index == 1)
-                {
-                    string word;
-                    istringstream iss(line);
-                    int order = 0;
-                    while (iss >> word)
-                    {
-                        if (order == 0)
-                        {
-                            year = stoi(word);
-                        }
-                        else if (order == 1)
-                        {  
-                            semester = decode_semester(word);
-                        }
-                        order++;
-                    }
-                }
-                else if (index == 2) {
-                    string word;
-                    istringstream iss(line);
-                    int order = 0;
-                    while (iss >> word)
-                    {
-                        if (order == 0)
-                        {
-                            user_id = stoi(word);
-                        }
-                        else if (order == 1)
-                        {
-                            name = word;
-                        }
-                        order++;
-                    }
-                }
-                index++;
-                // TODO: course 읽어오기
+            catch (const exception &e) {
+                cout << "Failed to decode table (line: " << current << ")" << endl;
             }
         }
     }
     else {
-        cerr << "파일을 열 수 없습니다." << endl;
+        cout << "Failed to open tables.txt" << endl;
     }
-
 }
 
 void TableDatabase::save() {
