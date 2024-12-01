@@ -30,6 +30,7 @@ vector<Table> TableDatabase::query(TableQuery tableQuery) {
         copy_if(result.begin(), result.end(), back_inserter(result),
                 [&](const Table &table) { return table.get_year() == stoi(tableQuery.year); });
     }
+    return result;
 }
 
 void TableDatabase::insert(Table &table) {	
