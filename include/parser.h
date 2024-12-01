@@ -8,6 +8,8 @@ struct ParseResult
     bool is_success;
     std::string tag;
     std::string value;
+
+    bool operator==(const std::string&) const;
 };
 
 // Parse tag and tag's contents

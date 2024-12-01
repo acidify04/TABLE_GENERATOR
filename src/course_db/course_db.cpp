@@ -1,5 +1,6 @@
 #include "course_db.h"
 #include "parser.h"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 
@@ -16,7 +17,51 @@ std::size_t DateIndexKeyHash::operator()(const DateIndexKey &key) const
            (std::hash<std::string>()(encode_weekday(key.weekday)) << 2) ^ (std::hash<int>()(key.time) << 3);
 }
 
-CourseDatabase::CourseDatabase() {};
+std::string convert_wstr_to_str(std::wstring wstr)
+{
+    const size_t size = wstr.size() * MB_CUR_MAX + 1;
+    char *new_str = new char[size];
+    size_t converted = std::wcstombs(new_str, wstr.c_str(), size);
+    if (converted == -1)
+    {
+        delete[] new_str;
+        return "";
+    }
+    std::string str = new_str;
+    delete[] new_str;
+    return str;
+}
+
+std::wstring convert_str_to_wstr(const std::string &str)
+{
+    size_t size = str.size() + 1;
+    wchar_t *wchars = new wchar_t[size];
+
+    std::mbstowcs(wchars, str.c_str(), size);
+
+    std::wstring wstr = wchars;
+    delete[] wchars;
+
+    return wstr;
+}
+
+std::set<std::string> get_token(const std::string &str, int by)
+{
+    if (str.size() < by)
+        return {};
+
+    std::set<std::string> result;
+
+    std::wstring wstr = convert_str_to_wstr(str);
+    for (size_t i = 0; i < wstr.size() - by + 1; i++)
+        result.insert(convert_wstr_to_str(wstr.substr(i, by)));
+    return result;
+}
+
+CourseDatabase::CourseDatabase()
+{
+    std::setlocale(LC_ALL, "ko_KR.UTF-8");
+};
 
 void CourseDatabase::load()
 {
@@ -46,7 +91,8 @@ void CourseDatabase::load_courses()
             {
                 Course course(result.value);
                 int id = course.get_id();
-                courses[id] = course;
+                course_by_id[id] = course;
+                course_ptrs.insert(&course_by_id[id]);
             }
         }
         catch (const std::exception &e)
@@ -85,40 +131,38 @@ void CourseDatabase::load_date_index()
     std::string line_str;
     while (std::getline(file, line_str))
     {
-        std::string::const_iterator begin = line_str.begin();
-        ParseResult result = parse_tag(begin, line_str.end());
-        if (result.is_success && result.tag == "index")
+        std::string::const_iterator point_of_input = line_str.begin();
+        ParseResult index_tag = parse_tag(point_of_input, line_str.end());
+
+        if (index_tag.is_success && index_tag == "index")
         {
-            begin = result.value.begin();
+            point_of_input = index_tag.value.begin();
             DateIndexKey key;
-            Courses course_ptrs;
-            for (; begin != result.value.end(); begin++)
+            CoursePtrSet course_ptr_set;
+            for (; point_of_input != index_tag.value.end(); point_of_input++)
             {
-                ParseResult property = parse_tag(begin, result.value.end());
-                if (property.tag == "year")
-                    key.year = std::stoi(property.value);
-                else if (property.tag == "semester")
-                    key.semester = decode_semester(property.value);
-                else if (property.tag == "time")
-                    key.time = std::stoi(property.value);
-                else if (property.tag == "weekday")
-                    key.weekday = decode_weekday(property.value);
-                else if (property.tag == "courses")
+                ParseResult property_tag = parse_tag(point_of_input, index_tag.value.end());
+                if (property_tag == "year")
+                    key.year = std::stoi(property_tag.value);
+                else if (property_tag == "semester")
+                    key.semester = decode_semester(property_tag.value);
+                else if (property_tag == "time")
+                    key.time = std::stoi(property_tag.value);
+                else if (property_tag == "weekday")
+                    key.weekday = decode_weekday(property_tag.value);
+                else if (property_tag == "courses")
                 {
-                    std::string ids = property.value;
-                    std::string::const_iterator ids_ptr = ids.begin();
-                    for (; ids_ptr != ids.end(); ids_ptr++)
+                    std::string id_tags = property_tag.value;
+                    std::string::const_iterator point_of_id_tags = id_tags.begin();
+                    for (; point_of_id_tags != id_tags.end(); point_of_id_tags++)
                     {
-                        ParseResult id_property = parse_tag(ids_ptr, ids.end());
-                        if (id_property.tag == "id")
-                        {
-                            int id = std::stoi(id_property.value);
-                            course_ptrs.insert(&courses[id]);
-                        }
+                        ParseResult id_tag = parse_tag(point_of_id_tags, id_tags.end());
+                        if (id_tag == "id")
+                            course_ptr_set.insert(&course_by_id[std::stoi(id_tag.value)]);
                     }
                 }
             }
-            date_index[key].insert(course_ptrs.begin(), course_ptrs.end());
+            date_index[key].insert(course_ptr_set.begin(), course_ptr_set.end());
         }
     }
 
@@ -127,9 +171,9 @@ void CourseDatabase::load_date_index()
 
 void CourseDatabase::indexing_by_date()
 {
-    for (auto &index : courses)
+    for (auto &element : course_by_id)
     {
-        Course &course = index.second;
+        Course &course = element.second;
         for (const auto time : course.get_times())
         {
             DateIndexKey key = {course.get_year(), course.get_semester(), time.weekday, time.time};
@@ -172,16 +216,15 @@ indexing by name format
 
 void CourseDatabase::indexing_by_name()
 {
-    for (const auto &element : courses)
+    for (const auto &element : course_by_id)
     {
         const Course &course = element.second;
-        std::string name = course.get_name();
-        std::set<std::string> tokens = seperate_str(name.begin(), name.end(), TokenLength);
+        std::set<std::string> tokens = get_token(course.get_name(), TokenLength);
         for (const auto &token : tokens)
             name_index[token].insert(&course);
     }
 
-    std::ofstream file("name_index.txt");
+    std::ofstream file("name_index.txt", std::ios::binary);
     std::string raw_value;
     for (const auto &element : name_index)
     {
@@ -215,30 +258,30 @@ void CourseDatabase::load_name_index()
     std::string line_str;
     while (std::getline(file, line_str))
     {
-        std::string::const_iterator begin = line_str.begin();
-        ParseResult index = parse_tag(begin, line_str.end());
+        std::string::const_iterator point_of_input = line_str.begin();
+        ParseResult index_tag = parse_tag(point_of_input, line_str.end());
 
-        if (index.is_success && index.tag == "index")
+        if (index_tag.is_success && index_tag == "index")
         {
-            begin = index.value.begin();
+            point_of_input = index_tag.value.begin();
             std::string key;
-            Courses course_ptrs;
-            for (; begin != index.value.end(); begin++)
+            CoursePtrSet course_ptrs;
+            for (; point_of_input != index_tag.value.end(); point_of_input++)
             {
-                ParseResult property = parse_tag(begin, index.value.end());
-                if (property.tag == "name")
-                    key = property.value;
-                else if (property.tag == "courses")
+                ParseResult property_tag = parse_tag(point_of_input, index_tag.value.end());
+                if (property_tag == "name")
+                    key = property_tag.value;
+                else if (property_tag == "courses")
                 {
-                    std::string ids = property.value;
-                    std::string::const_iterator ids_begin = ids.begin();
-                    for (; ids_begin != ids.end(); ids_begin++)
+                    std::string id_tags = property_tag.value;
+                    std::string::const_iterator point_of_id_tags = id_tags.begin();
+                    for (; point_of_id_tags != id_tags.end(); point_of_id_tags++)
                     {
-                        ParseResult id_tag = parse_tag(ids_begin, ids.end());
-                        if (id_tag.is_success && id_tag.tag == "id")
+                        ParseResult id_tag = parse_tag(point_of_id_tags, id_tags.end());
+                        if (id_tag.is_success && id_tag == "id")
                         {
                             int id = std::stoi(id_tag.value);
-                            course_ptrs.insert(&courses[id]);
+                            course_ptrs.insert(&course_by_id[id]);
                         }
                     }
                 }
@@ -250,81 +293,60 @@ void CourseDatabase::load_name_index()
     file.close();
 }
 
-std::set<std::string> seperate_str(std::string::iterator begin, std::string::iterator end, int by)
-{
-    std::set<std::string> result;
-    std::string token;
-    std::string::iterator current = begin;
-    std::string::iterator point = begin;
-    int count = 0;
-
-    for (; point != end; current++)
-    {
-        point = current;
-        for (count = 0; count < by;)
-        {
-            if (*point != ' ' && *point != '\n')
-            {
-                token.push_back(*point);
-                count++;
-            }
-            point++;
-        }
-        result.insert(token);
-        token.clear();
-    }
-
-    return result;
-}
-
 std::vector<Course> CourseDatabase::query(CourseQuery condition) const
 {
-    std::set<Weekday> week_query;
-    std::set<Time> time_query;
 
-    Courses matched_courses;
+    CoursePtrSet matched_courses;
 
     // query by using date index.
-    Courses date_matched_courses;
-    if (condition.weekdays.empty())
-        week_query = {Weekday::Sun, Weekday::Mon, Weekday::Tue, Weekday::Wed, Weekday::Thu, Weekday::Fri, Weekday::Sat};
-    else
-        week_query = condition.weekdays;
-
-    if (condition.times.empty())
-        time_query = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    else
-        time_query = condition.times;
-
-    for (auto time : time_query)
+    if (condition.weekdays.empty() && condition.times.empty())
     {
-        for (auto week : week_query)
+        matched_courses.insert(course_ptrs.begin(), course_ptrs.end());
+    }
+    else
+    {
+        std::set<Weekday> week_query;
+        std::set<Time> time_query;
+        if (condition.weekdays.empty())
+            week_query = {Weekday::Sun, Weekday::Mon, Weekday::Tue, Weekday::Wed,
+                          Weekday::Thu, Weekday::Fri, Weekday::Sat};
+        else
+            week_query = condition.weekdays;
+
+        if (condition.times.empty())
+            time_query = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        else
+            time_query = condition.times;
+
+        for (auto time : time_query)
         {
-            const DateIndexKey &key = {condition.year, condition.semester, week, time};
-            if (date_index.count(key) > 0)
-                date_matched_courses.insert(date_index.at(key).begin(), date_index.at(key).end());
+            for (auto week : week_query)
+            {
+                const DateIndexKey &key = {condition.year, condition.semester, week, time};
+                if (date_index.count(key) > 0)
+                    matched_courses.insert(date_index.at(key).begin(), date_index.at(key).end());
+            }
         }
     }
 
     // query by name index
     if (!condition.name.empty())
     {
-        std::string::iterator name_begin = condition.name.begin();
-        std::set<std::string> search_tokens = seperate_str(name_begin, condition.name.end(), TokenLength);
-        Courses name_matched_courses;
+        std::set<std::string> search_tokens = get_token(condition.name, TokenLength);
+        CoursePtrSet name_matched_courses;
         for (const auto &token : search_tokens)
         {
-            name_matched_courses.insert(name_index.at(token).begin(), name_index.at(token).end());
+            if (name_index.count(token))
+                name_matched_courses.insert(name_index.at(token).begin(), name_index.at(token).end());
         }
-        std::set_intersection(date_matched_courses.begin(), date_matched_courses.end(), name_matched_courses.begin(),
-                              name_matched_courses.end(), std::inserter(matched_courses, matched_courses.begin()));
+        CoursePtrSet intersection;
+        std::set_intersection(matched_courses.begin(), matched_courses.end(), name_matched_courses.begin(),
+                              name_matched_courses.end(), std::inserter(intersection, intersection.begin()));
+        matched_courses = std::move(intersection); // remove courses not in name_matched_courses.
     }
-    else
-        matched_courses = date_matched_courses;
 
     // query by departments, professors
-    Courses unmatched_courses;
-
+    std::vector<Course> result;
     for (const auto course_ptr : matched_courses)
     {
         bool is_matched = true;
@@ -332,32 +354,21 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
         if (!condition.departments.empty())
         {
             std::set<Department> departments = course_ptr->get_departments();
-            bool is_included = std::includes(condition.departments.begin(), condition.departments.end(),
-                                             departments.begin(), departments.end());
-            if (!is_included)
-            {
-                unmatched_courses.insert(course_ptr);
-                continue;
-            }
+            if (!std::includes(condition.departments.begin(), condition.departments.end(), departments.begin(),
+                               departments.end()))
+                is_matched = false;
         }
 
-        if (!condition.professors.empty())
+        if (is_matched && !condition.professors.empty())
         {
-            bool is_empty =
-                std::find(condition.professors.begin(), condition.professors.end(), course_ptr->get_professor())
-                    ->empty();
-            if (is_empty)
-            {
-                unmatched_courses.insert(course_ptr);
-                continue;
-            }
+            if (std::find(condition.professors.begin(), condition.professors.end(), course_ptr->get_professor())
+                    ->empty())
+                is_matched = false;
         }
-    }
 
-    std::vector<Course> result;
-    for (auto course_ptr : matched_courses)
-        if (unmatched_courses.count(course_ptr) == 0)
+        if (is_matched)
             result.push_back(*course_ptr);
+    }
 
     return result;
 }
