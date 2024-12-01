@@ -93,27 +93,6 @@ string encode_semester(Semester semester) {
     }
 } 
 
-// string to Semester
-Semester decode_semester(string str)
-{
-    if (str == "Spring")
-    {
-        return Semester::Spring;
-    }
-    else if (str == "Summer")
-    {
-        return Semester::Summer;
-    }
-    else if (str == "Fall")
-    {
-        return Semester::Fall;
-    }
-    else if (str == "Winter")
-    {
-        return Semester::Winter;
-    }
-} 
-
 Table::Table(string &str){
     ParseResult result;
     ParseResult course_result;
