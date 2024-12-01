@@ -6,9 +6,9 @@
 #include <iostream>
 #include "course.h"
 
-typedef std::set<const Course*> Courses;
+typedef std::set<const Course*> CoursePtrSet;
 
-std::set<std::string> seperate_str(std::string::iterator, std::string::iterator, int);
+std::set<std::string> get_token(const std::string&, int);
 
 struct CourseQuery
 {
@@ -44,9 +44,10 @@ struct DateIndexKeyHash { // for using index key in unordered map's key.
 
 class CourseDatabase
 {
-std::unordered_map<int, Course> courses;
-std::unordered_map<DateIndexKey, Courses, DateIndexKeyHash> date_index;
-std::unordered_map<std::string, Courses> name_index;
+std::unordered_map<int, Course> course_by_id;
+std::set<Course*> course_ptrs;
+std::unordered_map<DateIndexKey, CoursePtrSet, DateIndexKeyHash> date_index;
+std::unordered_map<std::string, CoursePtrSet> name_index;
 
 public:
 CourseDatabase();

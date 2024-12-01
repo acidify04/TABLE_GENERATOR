@@ -1,5 +1,10 @@
 #include "parser.h"
 
+bool ParseResult::operator==(const std::string &tag) const
+{
+    return this->tag == tag;
+}
+
 // Parse tag and tag's contents
 ParseResult parse_tag(std::string::const_iterator &pt, const std::string::const_iterator &end)
 {
