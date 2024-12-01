@@ -3,6 +3,7 @@
 
 #include "course.h"
 #include "table_db.h"
+struct TableQuery;
 #include <string>
 #include <vector>
 

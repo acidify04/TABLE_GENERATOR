@@ -2,8 +2,19 @@
 #define _TABLE_DB_H_
 
 #include "table.h"
+class Table;
 #include <string>
 #include <vector>
+#include "course.h"
+
+struct TableQuery
+{
+    std::string id;
+    Semester semester;
+    std::string year;
+    std::string name;
+    std::string user_id;
+};
 
 class TableDatabase
 {
@@ -19,16 +30,6 @@ class TableDatabase
 
   private:
     std::vector<Table> tables;
-};
-
-struct TableQuery
-{
-    std::string id;
-    std::string department;
-    std::string semester;
-    std::string year;
-    std::string name;
-    std::string user_id;
 };
 
 #endif

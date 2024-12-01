@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include "table.h"
+#include "parser.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ vector<Course> Table::get_course() const {
 }
 
 bool Table::is_satisfy(TableQuery tableQuery) const {
-    if (semester != decode_semester(tableQuery.semester)) {
+    if (semester != tableQuery.semester) {
         return false;
     }
 
@@ -75,25 +76,7 @@ string Table::encode(){
     return raw_value;
 }
 
-// semester to string
-string encode_semester(Semester semester) {
-    if (semester == Semester::Spring) {
-        return "Spring";
-    }
-    else if (semester == Semester::Summer) {
-        return "Summer";
-    }
-    else if (semester == Semester::Fall)
-    {
-        return "Fall";
-    }
-    else if (semester == Semester::Winter)
-    {
-        return "Winter";
-    }
-} 
-
-Table::Table(string &str){
+Table::Table(const string &str){
     ParseResult result;
     ParseResult course_result;
     auto it = str.begin();
@@ -155,67 +138,4 @@ int Table::get_user_id() const {
 
 int Table::get_id() const {
     return id;
-}
-
-struct ParseResult
-{
-    bool is_success;
-    string tag;
-    string value;
-};
-
-// Parse tag and tag's contents
-ParseResult parse_tag(string::const_iterator &pt, const string::const_iterator &end)
-{
-    ParseResult result;
-
-    std::string target_token;
-    std::string temp_token;
-    bool is_success = false;
-    bool is_course = false;
-    bool is_token_content = false;
-    bool is_token = false;
-    bool is_closed = false;
-    std::string value_str;
-
-    for (; pt != end; ++pt)
-    {
-        if (is_token)
-        {
-            if (*pt == '/')
-                is_closed = true;
-            else if (*pt == '>')
-            {
-                bool is_target_exit = target_token.size() > 0;
-                if (is_closed)
-                {
-                    if (is_target_exit && target_token == temp_token)
-                    {
-                        is_success = true;
-                        break;
-                    }
-                    else
-                        value_str.append("</" + temp_token + ">");
-                    is_closed = false;
-                }
-                else if (!is_target_exit)
-                {
-                    target_token = temp_token;
-                    is_token_content = true;
-                }
-                else
-                    value_str.append("<" + temp_token + ">");
-                is_token = false;
-                temp_token.clear();
-            }
-            else
-                temp_token.push_back(*pt);
-        }
-        else if (*pt == '<')
-            is_token = true;
-        else if (*pt != '\n' && is_token_content)
-            value_str.push_back(*pt);
-    }
-
-    return ParseResult{is_success, target_token, value_str};
 }
