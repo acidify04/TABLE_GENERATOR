@@ -8,7 +8,7 @@ int main()
     //std::cout << "Hello World!" << std::endl;
     TableDatabase td;
 
-    Table table1()
+    Table table1();
 
     //td.insert();
 
