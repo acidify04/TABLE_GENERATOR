@@ -60,9 +60,6 @@ void TableDatabase::remove(int id) {
 void TableDatabase::load() {
     fstream file("tables.txt");
     string line;
-    bool isTable = false;
-    bool isCourse = false;
-    int index = 0;
 
     size_t current = 0;
 
