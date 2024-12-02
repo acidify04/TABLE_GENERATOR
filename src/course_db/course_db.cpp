@@ -1,8 +1,10 @@
 #include "course_db.h"
 #include "parser.h"
+#include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 #define TokenLength 2
 
