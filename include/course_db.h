@@ -4,6 +4,7 @@
 #include <set>
 #include <string>
 #include <iostream>
+#include <unordered_map>
 #include "course.h"
 
 typedef std::set<const Course*> CoursePtrSet;

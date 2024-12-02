@@ -4,6 +4,7 @@
 #include <string>
 #include <set>
 #include <optional>
+#include <vector>
 
 typedef int Time;
 
