@@ -17,11 +17,14 @@ class TableGenerator
     CourseDatabase &courseDB; 
     TableDatabase &tableDB;
 
+    vector<string> existCourse;
+
     int currentGrade = 0; // 지금까지 넣은 강의의 총 학점수
     int totalGrade; // 설정한 총 학점수
-    unordered_set<CourseTime> time; // 생성한 시간표에 채워진 시간
+    vector<CourseTime> time; // 생성한 시간표에 채워진 시간
 
-    bool findTime(Course &course); // 겹치는 시간있는지 확인하는 함수
+    bool findTime(Course course); // 겹치는 시간있는지 확인하는 함수
+    bool isConflict(Course course);
   public:
     void setTotalGrade(int i); // 총 학점수 설정
 
@@ -29,6 +32,6 @@ class TableGenerator
 
     TableGenerator(CourseDatabase &courseDB, TableDatabase &tableDB); // 생성자 courseDB와 tableDB를 받습니다.
 
-    void generateTable(TableDatabase &tableDB, Table table); // 시간표를 만듭니다.
+    void generateTable(Table &table); // 시간표를 만듭니다.
 };
 #endif
