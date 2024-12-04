@@ -61,6 +61,8 @@ bool english_a;
 std::string professor;
 std::set<Department> departments;
 std::vector<CourseTime> times;
+int grade;
+int minimum_year;
 
 public:
     Course();
@@ -71,6 +73,7 @@ public:
 
     int get_id() const;
     int get_grade() const;
+    int get_minimum_year() const;
     std::vector<CourseTime> get_times() const;
     std::string get_name() const;
     std::string get_professor() const;

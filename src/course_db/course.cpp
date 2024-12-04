@@ -29,7 +29,12 @@ int Course::get_id() const
 
 int Course::get_grade() const
 {
-    return times.size();
+    return grade;
+}
+
+int Course::get_minimum_year() const
+{
+    return minimum_year;
 }
 
 std::vector<CourseTime> Course::get_times() const
@@ -87,6 +92,8 @@ Course Format
     <professor>string</professor>
     <department>integer</department> // support multiple department
     <department>integer</department>
+    <minimum_year>integer</minimum_year>
+    <grade>integer</grade>
     <time> // support multiple department
         <weekday>integer</weekday>
         <t>integer</t>
@@ -107,30 +114,33 @@ Course::Course(const std::string &input)
     std::string::const_iterator pt;
     for (pt = input.begin(); pt != input.end();)
     {
-        ParseResult result = parse_tag(pt, input.end());
-        if (!result.is_success)
+        ParseResult tag = parse_tag(pt, input.end());
+        if (!tag.is_success)
             throw std::runtime_error("Fail to decode course.");
-        else if (result.tag == "time")
-            this->times.push_back(decode_coursetime(result.value));
-        else if (result.tag == "department")
-            this->departments.insert(decode_department(result.value));
-        else if (result.tag == "id")
-            id = std::stoi(result.value);
-        else if (result.tag == "name")
-            name = result.value;
-        else if (result.tag == "professor")
-            professor = result.value;
-        else if (result.tag == "type")
-            type = decode_coursetype(result.value);
-        else if (result.tag == "semester")
-            semester = decode_semester(result.value);
-        else if (result.tag == "year")
-            year = std::stoi(result.value);
-        else if (result.tag == "english")
-            english_a = result.value != "0";
-        else if (result.tag != "course")
+        else if (tag == "time")
+            this->times.push_back(decode_coursetime(tag.value));
+        else if (tag == "department")
+            this->departments.insert(decode_department(tag.value));
+        else if (tag == "id")
+            id = std::stoi(tag.value);
+        else if (tag == "name")
+            name = tag.value;
+        else if (tag == "professor")
+            professor = tag.value;
+        else if (tag == "type")
+            type = decode_coursetype(tag.value);
+        else if (tag == "semester")
+            semester = decode_semester(tag.value);
+        else if (tag == "year")
+            year = std::stoi(tag.value);
+        else if (tag == "english")
+            english_a = tag.value != "0";
+        else if (tag == "minimum_year")
+            minimum_year = std::stoi(tag.value);
+        else if (tag == "grade")
+            grade = std::stoi(tag.value);
+        else if (tag.tag != "course")
             throw std::runtime_error("Invalid tag error");
-
         if (pt + 1 == input.end())
             break;
     }
@@ -264,6 +274,8 @@ std::string Course::encode() const
     raw_value.append("<type>" + encode_coursetype(type) + "</type>");
     raw_value.append("<year>" + std::to_string(year) + "</year>");
     raw_value.append("<semester>" + encode_semester(semester) + "</semester>");
+    raw_value.append("<minimum_year>" + std::to_string(minimum_year) + "</minimum_year>");
+    raw_value.append("<grade>" + std::to_string(grade) + "</grade>");
     if (english_a)
         raw_value.append("<english>1</english>");
     else
