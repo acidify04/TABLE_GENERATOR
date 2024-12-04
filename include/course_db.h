@@ -49,6 +49,7 @@ std::unordered_map<int, Course> course_by_id;
 std::set<Course*> course_ptrs;
 std::unordered_map<DateIndexKey, CoursePtrSet, DateIndexKeyHash> date_index;
 std::unordered_map<std::string, CoursePtrSet> name_index;
+int version;
 
 public:
 CourseDatabase();
@@ -56,10 +57,16 @@ std::vector<Course> query(CourseQuery) const;
 void load();
 
 private:
-void load_courses();
-void load_date_index();
+void load_db_version();
+void update_db_version(int);
+// return course data version.
+int load_courses();
+void load_date_index(bool);
 void indexing_by_date();
-void load_name_index();
+void load_name_index(bool is_update);
 void indexing_by_name();
+std::fstream open_cache(std::string);
+std::fstream open_file(std::string);
+std::ofstream write_cache(std::string);
 };
 #endif
