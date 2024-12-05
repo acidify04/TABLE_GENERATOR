@@ -21,11 +21,11 @@ void TableGenerator::generateTable(Table &table) //query로 처리된 courseDB에 있�
     this->existCourse.clear();
     this->time.clear();
     shuffle(courses.begin(), courses.end(), g); // course의 순서를 섞음
-    if (!query.name.empty())
+    if (!query.name.empty()) //특정과목이 있는 경우
     {
         table.insert_course(courses[0]);
-        this->existCourse.push_back(courses[0].get_name());
-        this->currentGrade += courses[0].get_grade(); // 현재 총 학점수를 강의의 학점만큼 증가
+        this->existCourse.insert(courses[0].get_name());
+        this->currentGrade += courses[0].get_grade();
     }
 
 
@@ -39,7 +39,7 @@ void TableGenerator::generateTable(Table &table) //query로 처리된 courseDB에 있�
             if (this->findTime(course) && findCourse(course)) // 시간이 겹치지 않을 경우
             {
                 table.insert_course(course); // 시간표에 강의 추가
-                this->existCourse.push_back(course.get_name());
+                this->existCourse.insert(course.get_name());
                 this->currentGrade += course.get_grade(); // 현재 총 학점수를 강의의 학점만큼 증가
             }
         }
@@ -80,13 +80,9 @@ bool TableGenerator::findTime(Course course) // 겹치는 시간 있는지 확인
 
 bool TableGenerator::findCourse(Course course) // 같은 과목 안들어가도록 설정
 {
-    for (string name : this->existCourse)
+    if (this->existCourse.find(course.get_name()) != this->existCourse.end())
     {
-        if (name == course.get_name())
-        {
-            return false;
-        }
+        return false;
     }
-
     return true;
 }

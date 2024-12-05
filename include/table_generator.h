@@ -17,7 +17,7 @@ class TableGenerator
     CourseDatabase &courseDB; 
     TableDatabase &tableDB;
 
-    vector<string> existCourse;
+    unordered_set<string> existCourse;
 
     int currentGrade = 0; // 지금까지 넣은 강의의 총 학점수
     int totalGrade; // 설정한 총 학점수
