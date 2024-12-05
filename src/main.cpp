@@ -1,8 +1,10 @@
 #include "course_db.h"
+#include "display.h"
+//#include "schedule_management.h"
+#include "table_db.h"
+#include <conio.h>
 #include <iostream>
 #include <string>
-#include "table_db.h"
-#include "table_generator.h"
 
 using namespace std;
 
@@ -25,5 +27,6 @@ int main()
         cout << course.get_name() << endl;
     }
     
+    mainMenu();
     return 0;
 }
