@@ -13,6 +13,6 @@ int main()
     db.insert(table);
     db.save();
     db.load();
-    
+
     return 0;
 }
