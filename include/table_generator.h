@@ -24,7 +24,7 @@ class TableGenerator
     vector<CourseTime> time; // 생성한 시간표에 채워진 시간
 
     bool findTime(Course course); // 겹치는 시간있는지 확인하는 함수
-    bool isConflict(Course course);
+    bool findCourse(Course course);
   public:
     void setTotalGrade(int i); // 총 학점수 설정
 
