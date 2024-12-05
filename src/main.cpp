@@ -12,13 +12,18 @@ int main()
     CourseDatabase courseDB;
     courseDB.load();
     TableDatabase db;
-    CourseQuery query = {Semester::Fall, 2024, {}, {}, "", {}, {}};
+    CourseQuery query = {Semester::Fall, 2024, {}, {}, "ACT", {}, {}};
 
     Table table("sample id");
     TableGenerator table_generator(courseDB, db);
     table_generator.setTotalGrade(20);
     table_generator.setQuery(query);
     table_generator.generateTable(table);
+
+    for (Course course : table.get_course())
+    {
+        cout << course.get_name() << endl;
+    }
     
     return 0;
 }
