@@ -1,6 +1,7 @@
 #include "course_db.h"
 #include <iostream>
 #include <string>
+#include <set>
 #include "table_db.h"
 #include "table_generator.h"
 
@@ -11,19 +12,13 @@ int main()
     std::cout << "Hello World!" << std::endl;
     CourseDatabase courseDB;
     courseDB.load();
-    TableDatabase db;
-    CourseQuery query = {Semester::Fall, 2024, {}, {}, "ACT", {}, {}};
-
-    Table table("sample id");
-    TableGenerator table_generator(courseDB, db);
-    table_generator.setTotalGrade(20);
-    table_generator.setQuery(query);
-    table_generator.generateTable(table);
-
-    for (Course course : table.get_course())
+    std::set<std::string> prof = {"ÇÑ¹Ì¶ó"};
+    CourseQuery query = {Semester::Fall, 1900, {}, {}, "", {}, prof};
+    for (const auto course : courseDB.query(query))
     {
         cout << course.get_name() << endl;
     }
+
     
     return 0;
 }
