@@ -15,8 +15,8 @@ enum class Weekday
 
 enum class CourseType
 {
-    General_Education,
-    CoreCommunication,
+    General_Education, // 공통교양
+    CoreCommunication, // 핵심-소통
     CoreCreativity,
     CoreChallenge,
     CoreConvergence,

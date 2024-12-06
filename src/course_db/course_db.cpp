@@ -407,9 +407,12 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
 
         if (is_matched && !condition.professors.empty())
         {
-            if (std::find(condition.professors.begin(), condition.professors.end(), course_ptr->get_professor())
-                    ->empty())
-                is_matched = false;
+            is_matched = condition.professors.find(course_ptr->get_professor()) != condition.professors.end(); // O(logn) 탐색시간 소요
+        }
+
+        if (is_matched && !condition.types.empty())
+        {
+            is_matched = condition.types.find(course_ptr->get_type()) != condition.types.end(); // O(logn)의 탐색시간 소요
         }
 
         if (is_matched)
