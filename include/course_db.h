@@ -17,16 +17,23 @@ struct CourseQuery
     Semester semester;
     // Year is required
     int year;
+    // User's year 
+    int user_year;
+
+    /* - 아래 속성들의 경우 값이 비어있으면, 모든 강의를 쿼리합니다.*/
+
+    // Query by course name. Query support n-gram query. if empty, all courses will be quried.
+    std::string name;
     // Set weekdays that you want to query. if empty, all weekday's courses will be quried.
     std::set<Weekday> weekdays;
     // Set times you want to query. if empty, all times will be quried.
     std::set<Time> times;
-    // Query by course name. Query support n-gram query. if empty, all courses will be quried.
-    std::string name;
     // Query by departments. if empty, all department's courses will be quried.
     std::set<Department> departments;
     // Query by professor. if empty, all courses will be quried.
     std::set<std::string> professors;
+    // Query by type
+    std::set<CourseType> types;
 };
 
 struct DateIndexKey
