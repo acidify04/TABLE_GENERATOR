@@ -17,6 +17,8 @@ struct CourseQuery
     Semester semester;
     // Year is required
     int year;
+    // User's year 
+    int user_year;
     // Set weekdays that you want to query. if empty, all weekday's courses will be quried.
     std::set<Weekday> weekdays;
     // Set times you want to query. if empty, all times will be quried.

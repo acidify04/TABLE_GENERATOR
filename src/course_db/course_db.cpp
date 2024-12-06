@@ -394,7 +394,10 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
     {
         bool is_matched = true;
 
-        if (!condition.departments.empty())
+        if (condition.user_year < course_ptr->get_minimum_year())
+            is_matched = false;
+
+        if (is_matched && !condition.departments.empty())
         {
             std::set<Department> departments = course_ptr->get_departments();
             if (!std::includes(condition.departments.begin(), condition.departments.end(), departments.begin(),
