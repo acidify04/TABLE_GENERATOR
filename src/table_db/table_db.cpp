@@ -3,7 +3,6 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
-#include <sstream>
 #include "table_db.h"
 #include "parser.h"
 
@@ -64,15 +63,14 @@ void TableDatabase::remove(int id) {
 void TableDatabase::load() {
     fstream file("tables.txt");
     string line;
-
-    string::const_iterator it = line.begin();
     size_t current = 0;
 
     if (file.is_open()) {
         while (getline(file, line)) {
+            string::const_iterator it = line.begin();
             try {
                 ParseResult result = parse_tag(it, line.end());
-                if (result.tag == "table") {
+                if (result.tag == "Table") {
                     Table table(result.value);
                     tables.push_back(table);
                 }

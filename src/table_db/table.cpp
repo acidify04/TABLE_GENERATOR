@@ -70,7 +70,7 @@ string Table::encode(){
     raw_value.append("<name>" + name + "</name>");
 
     for (auto course : courses) {
-        raw_value.append("<course>" + course.encode() + "</course>");
+        raw_value.append(course.encode());
     }
     raw_value.append("</Table>");
     return raw_value;
@@ -79,7 +79,7 @@ string Table::encode(){
 Table::Table(const string &str){
     ParseResult result;
     ParseResult course_result;
-    auto it = str.begin();
+    string::const_iterator it = str.begin();
     while (it != str.end()) {
         result = parse_tag(it, str.end());
         if (result.is_success) {
@@ -87,7 +87,7 @@ Table::Table(const string &str){
                 id = stoi(result.value);
             }
             else if (result.tag == "name") {
-                name = stoi(result.value);
+                name = result.value;
             }
             else if (result.tag == "user_id") {
                 user_id = stoi(result.value);
@@ -95,12 +95,15 @@ Table::Table(const string &str){
             else if (result.tag == "year") {
                 year = stoi(result.value);
             }
-            else if (result.tag == "Semester") {
+            else if (result.tag == "semester") {
                 semester = decode_semester(result.value);
             }
-            else if (result.tag == "Course") {
+            else if (result.tag == "course") {
                 Course course(result.value);
                 courses.push_back(course);
+            }
+            else if (it + 1 == str.end()) {
+                break;
             }
         }
     }

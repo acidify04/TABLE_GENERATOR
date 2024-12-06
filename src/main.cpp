@@ -10,23 +10,37 @@ using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!" << std::endl;
+    //std::cout << "Hello World!" << std::endl;
     CourseDatabase courseDB;
     courseDB.load();
     TableDatabase db;
-    CourseQuery query = {Semester::Fall, 2024, {}, {}, "ACT", {}, {}};
+    CourseQuery query = {Semester::Fall, 2024, {}, {}, "", {}, {}};
 
-    Table table("sample id");
-    TableGenerator table_generator(courseDB, db);
+    Table table(1, 10101, "asdf", courseDB.query(query), 3, Semester::Fall);
+    //db.insert(table);
+    /* TableGenerator table_generator(courseDB, db);
     table_generator.setTotalGrade(20);
     table_generator.setQuery(query);
-    table_generator.generateTable(table);
+    table_generator.generateTable(table);*/
+    //db.save();
+    db.load();
 
-    for (Course course : table.get_course())
+    if (!db.get_tables().empty())
     {
-        cout << course.get_name() << endl;
+        for (Course course : db.get_tables()[0].get_course())
+        {
+            cout << course.get_name() << endl;
+        }
+        if (db.get_tables()[0].get_course().empty())
+        {
+            cout << "empty" << endl;
+        }
+    }
+    else
+    {
+        cout << "error" << endl;
     }
     
-    mainMenu();
+    //mainMenu();
     return 0;
 }
