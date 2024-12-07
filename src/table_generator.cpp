@@ -13,17 +13,16 @@ TableGenerator::TableGenerator(CourseDatabase &courseDB, TableDatabase &tableDB)
 
 void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ ÀÖ´Â courseÁß greedyAloghrithmÀ¸·Î ½Ã°£Ç¥ »ý¼º
 {
-
     vector<Course> courses = courseDB.query(query); // °­ÀÇ¸ñ·Ï »ý¼º
 
-    for (Course a : courses)
+    for (int i = 0; i < courses.size(); i++)
     {
-        std::cout << a.get_name() << '\n';
+        courses[i].grade = 2;
     }
 
-    int input;
+    totalGrade = 20;
 
-    cin >> input;
+
 
     random_device rd;
     mt19937 g(rd());// ·£´ý
@@ -43,6 +42,7 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
     query.name.clear();
     courses = this->courseDB.query(this->query);
     shuffle(courses.begin(), courses.end(), g);
+
     if (!query.professors.empty() && !courses.empty()) // ¿ì¼±¼øÀ§ ±³¼ö Ã³¸®
     {
         for (Course &course : courses)
@@ -62,6 +62,14 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
     }
 
     courses = this->courseDB.query(this->query);
+
+    
+    for (int i = 0; i < courses.size(); i++)
+    {
+        courses[i].grade = 2;
+    }
+
+
     shuffle(courses.begin(), courses.end(), g);
     for (Course &course : courses) // ³ª¸ÓÁö °ú¸ñ Ã³¸®
     {
@@ -75,6 +83,12 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
             }
         }
     }
+
+    for (auto course : table.get_course())
+    {
+        cout << course.get_name() << '\n';
+    }
+
     this->tableDB.insert(table);
 }
 

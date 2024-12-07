@@ -21,7 +21,7 @@ Display::Display(
 
 }
 
-void Display::display(Table& table) const
+void Display::display()
 {
     // 요일과 시간에 따라 강의를 매핑할 맵 (요일별로 시간 매핑)
     std::map<Weekday, std::map<Time, std::string>> schedule;
@@ -29,8 +29,10 @@ void Display::display(Table& table) const
     CourseQuery query;
     query.departments.insert(Department::ComputerScience);
     query.user_year = 2;
-    vector<Course> courseList = courseDatabase.query(query);
-   
+    tableGenerator.setQuery(query);
+    tableGenerator.generateTable(table);
+
+    vector<Course> courseList = table.get_course();
 
     // 요일을 문자열로 변환하기 위한 배열
     std::vector<std::string> daysOfWeek = {"Mon", "Tue", "Wed", "Thu", "Fri"};
@@ -47,50 +49,54 @@ void Display::display(Table& table) const
     }
 
     // 시간표 출력
-    std::cout << "===========================================================\n";
+    std::cout << "====================================================================================================="
+                 "=================\n";
     std::cout << "Schedule:\n";
 
     // 헤더 출력
     std::cout << "Time ";
     for (size_t i = 0; i < daysOfWeek.size(); ++i) // Mon~Fri만 출력
     {
-        std::cout << std::setw(15) << daysOfWeek[i];
+        std::cout << std::setw(30) << daysOfWeek[i];
     }
     std::cout << '\n';
-    std::cout << "===========================================================\n";
+    std::cout << "====================================================================================================="
+                 "=================\n";
 
     // 시간 단위로 출력
     for (Time time = 1; time <= 10; ++time) // 시간은 1부터 10까지 가정
     {
-        std::cout << std::setw(4) << time << " ";      // 시간 출력
-        for (size_t i = 1; i < daysOfWeek.size(); ++i) // Mon~Fri만 출력
+        std::cout << std::setw(4) << time << " "; // 시간 출력
+
+        for (size_t i = 0; i < daysOfWeek.size(); ++i) // Mon~Fri만 출력
         {
             Weekday weekday = static_cast<Weekday>(i);
+
             if (schedule[weekday].count(time)) // 특정 시간에 강의가 있는 경우
             {
-                std::cout << std::setw(10) << schedule[weekday][time];
+                std::cout << std::setw(30) << schedule[weekday][time];
             }
             else // 강의가 없는 경우 공백 출력
             {
-                std::cout << std::setw(10) << " ";
+                std::cout << std::setw(30) << " ";
             }
         }
         std::cout << '\n';
     }
 
-    std::cout << "===========================================================\n";
+    std::cout << "====================================================================================================="
+                 "=================\n";
 
     int input;
-
-    cin >> input;
+    std::cin >> input;
 }
+
 
 void Display::createSchedule()
 {
     system("cls");
     vector<Course> courses = courseDatabase.query({});
     CourseQuery query;
-    Table table;
 
     int input;
 
@@ -391,7 +397,7 @@ void Display::mainMenu()
         //    return;
         case 3:
             system("cls");
-            display(table);
+            display();
             break;
         default:
             cout << "Please select a valid option." << endl;

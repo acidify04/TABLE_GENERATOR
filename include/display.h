@@ -38,6 +38,7 @@ class Display
     CourseDatabase courseDatabase;
     TableDatabase tableDatabase;
     TableGenerator tableGenerator;
+    Table table;
     User user;
 
     public:
@@ -46,7 +47,7 @@ class Display
     void addDay(const string &day);
     void removeCourse(int index);
     void removeDay(int index);
-    void display(Table& table) const;
+    void display();
     void createSchedule();
     void searchAndModifySchedule();
     void setupUser();

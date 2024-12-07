@@ -61,10 +61,10 @@ bool english_a;
 std::string professor;
 std::set<Department> departments;
 std::vector<CourseTime> times;
-int grade;
 int minimum_year;
 
 public:
+int grade;
     Course();
     // Decode from string
     Course(const std::string&);
