@@ -6,6 +6,8 @@
 //#include <conio.h>
 #include <iostream>
 #include <string>
+#include "table_db.h"
+#include "table_generator.h"
 
 using namespace std;
 
@@ -15,37 +17,18 @@ int main()
     CourseDatabase courseDB;
     courseDB.load();
     TableDatabase db;
-    CourseQuery query = {Semester::Fall, 2024, 2, "", {}, {}, {}, {}, {}};
+    CourseQuery query = {Semester::Fall, 2024, 3, "", {}, {}, {}, {}};
 
-    Table table(1, 10101, "asdf", courseDB.query(query), 3, Semester::Fall);
-    db.insert(table);
-    /* TableGenerator table_generator(courseDB, db);
+    Table table("sample id");
+    TableGenerator table_generator(courseDB, db);
     table_generator.setTotalGrade(20);
     table_generator.setQuery(query);
-    table_generator.generateTable(table);*/
-    //db.save();
-    db.load();
+    table_generator.generateTable(table);
 
-    if (!db.get_tables().empty())
+    for (Course course : table.get_course())
     {
-        for (auto course : db.get_tables()[0].get_course())
-        {
-            cout << course.get_name() << ": "<<course.get_professor() << endl;
-        }
-        if (db.get_tables()[0].get_course().empty())
-        {
-            cout << "empty" << endl;
-        }
+        cout << course.get_name() << endl;
     }
-    else
-    {
-        cout << "error" << endl;
-    }
-    /*for (const auto &course : courseDB.query(query))
-    {
-        cout << course.get_name() << ":" << course.get_professor() << endl;
-    }*/
     
-    //mainMenu();
     return 0;
 }
