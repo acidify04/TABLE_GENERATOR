@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <iostream>
 #include <unordered_set>
+#include <map>
 
 using namespace std;
 
@@ -20,93 +21,73 @@ Display::Display(
 
 }
 
-//void Display::addCourse(const string &course)
-//{
-//    courses.push_back(course);
-//}
-//
-//void Display::addDay(const string &day)
-//{
-//    days.push_back(day);
-//}
-//
-//void Display::removeCourse(int index)
-//{
-//    if (index >= 0 && index < courses.size())
-//    {
-//        courses.erase(courses.begin() + index);
-//    }
-//}
-//
-//void Display::removeDay(int index)
-//{
-//    if (index >= 0 && index < days.size())
-//    {
-//        days.erase(days.begin() + index);
-//    }
-//}
-//
-//void Display::display() const
-//{
-//    cout << "===========================================================\n";
-//    cout << "Schedule ID: " << id << "\n";
-//    cout << "Year: " << year << ", Semester: " << semester << ", Department: " << department << "\n";
-//    cout << "Courses:\n";
-//
-//    for (const auto &course : courses)
-//    {
-//        cout << "  - " << course << "\n";
-//    }
-//
-//    cout << "Days to Avoid: ";
-//    for (const auto &day : days)
-//    {
-//        cout << day << " ";
-//    }
-//    cout << "\n";
-//
-//    vector<string> daysOfWeek = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-//    vector<vector<string>> scheduleTable(7);
-//    unordered_set<string> addedCourses;
-//
-//    for (const auto &course : courses)
-//    {
-//        for (const auto &courseObj : courseDb.query({}))
-//        {
-//            if (courseObj.get_name() == course && addedCourses.find(course) == addedCourses.end())
-//            {
-//                for (const auto &courseTime : courseObj.get_times())
-//                {
-//                    int dayIndex = static_cast<int>(courseTime.weekday);
-//                    if (find(days.begin(), days.end(), daysOfWeek[dayIndex]) == days.end() &&
-//                        find(days.begin(), days.end(), daysOfWeek[dayIndex]) == days.end())
-//                    {
-//                        scheduleTable[dayIndex].push_back(course);
-//                    }
-//                }
-//                addedCourses.insert(course);
-//            }
-//        }
-//    }
-//
-//    cout << "\n===========================================================\n";
-//    cout << "Weekly Schedule:\n";
-//    for (int i = 0; i < 7; ++i)
-//    {
-//        cout << daysOfWeek[i] << " | ";
-//        for (const auto &course : scheduleTable[i])
-//        {
-//            cout << course << " | ";
-//        }
-//        cout << "\n";
-//    }
-//    cout << "===========================================================\n";
-//}
+void Display::display(Table& table) const
+{
+    // 요일과 시간에 따라 강의를 매핑할 맵 (요일별로 시간 매핑)
+    std::map<Weekday, std::map<Time, std::string>> schedule;
+
+    CourseQuery query;
+    query.departments.insert(Department::ComputerScience);
+    query.user_year = 2;
+    vector<Course> courseList = courseDatabase.query(query);
+   
+
+    // 요일을 문자열로 변환하기 위한 배열
+    std::vector<std::string> daysOfWeek = {"Mon", "Tue", "Wed", "Thu", "Fri"};
+
+    // 강의 데이터를 맵에 추가
+    for (const auto &course : courseList)
+    {
+        for (const auto &courseTime : course.get_times())
+        {
+            Weekday weekday = courseTime.weekday;
+            Time time = courseTime.time;
+            schedule[weekday][time] = course.get_name(); // 요일과 시간별로 강의 이름 저장
+        }
+    }
+
+    // 시간표 출력
+    std::cout << "===========================================================\n";
+    std::cout << "Schedule:\n";
+
+    // 헤더 출력
+    std::cout << "Time ";
+    for (size_t i = 0; i < daysOfWeek.size(); ++i) // Mon~Fri만 출력
+    {
+        std::cout << std::setw(15) << daysOfWeek[i];
+    }
+    std::cout << '\n';
+    std::cout << "===========================================================\n";
+
+    // 시간 단위로 출력
+    for (Time time = 1; time <= 10; ++time) // 시간은 1부터 10까지 가정
+    {
+        std::cout << std::setw(4) << time << " ";      // 시간 출력
+        for (size_t i = 1; i < daysOfWeek.size(); ++i) // Mon~Fri만 출력
+        {
+            Weekday weekday = static_cast<Weekday>(i);
+            if (schedule[weekday].count(time)) // 특정 시간에 강의가 있는 경우
+            {
+                std::cout << std::setw(10) << schedule[weekday][time];
+            }
+            else // 강의가 없는 경우 공백 출력
+            {
+                std::cout << std::setw(10) << " ";
+            }
+        }
+        std::cout << '\n';
+    }
+
+    std::cout << "===========================================================\n";
+
+    int input;
+
+    cin >> input;
+}
 
 void Display::createSchedule()
 {
     system("cls");
-    courseDatabase.load();
     vector<Course> courses = courseDatabase.query({});
     CourseQuery query;
     Table table;
@@ -328,6 +309,8 @@ void Display::createSchedule()
     tableGenerator.setQuery(query);
     tableGenerator.generateTable(table);
 
+
+
 }
 
 
@@ -379,6 +362,7 @@ void Display::mainMenu()
 {
     system("cls");
     int choice;
+    Table table;
 
     while (true)
     {
@@ -405,6 +389,10 @@ void Display::mainMenu()
         //    system("cls");
         //    cout << "Exiting the program." << endl;
         //    return;
+        case 3:
+            system("cls");
+            display(table);
+            break;
         default:
             cout << "Please select a valid option." << endl;
         }

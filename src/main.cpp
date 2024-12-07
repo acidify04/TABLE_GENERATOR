@@ -13,8 +13,10 @@ using namespace std;
 int main()
 {
     std::cout << "Hello World!" << std::endl;
+
     CourseDatabase courseDatabase;
     TableDatabase tableDatabase;
+    courseDatabase.load();
     TableGenerator tableGenerator(courseDatabase, tableDatabase);
     
     Display display(courseDatabase, tableDatabase, tableGenerator);

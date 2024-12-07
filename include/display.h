@@ -46,7 +46,7 @@ class Display
     void addDay(const string &day);
     void removeCourse(int index);
     void removeDay(int index);
-    void display() const;
+    void display(Table& table) const;
     void createSchedule();
     void searchAndModifySchedule();
     void setupUser();

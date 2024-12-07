@@ -13,13 +13,17 @@ TableGenerator::TableGenerator(CourseDatabase &courseDB, TableDatabase &tableDB)
 
 void TableGenerator::generateTable (Table &table) // query로 처리된 courseDB에 있는 course중 greedyAloghrithm으로 시간표 생성
 {
-    vector<Course> courses = courseDB.query(query); // 강의목록 생성
-   
-    cout << "왜 안돼 \n";
 
-    for (Course a : courses){
+    vector<Course> courses = courseDB.query(query); // 강의목록 생성
+
+    for (Course a : courses)
+    {
         std::cout << a.get_name() << '\n';
     }
+
+    int input;
+
+    cin >> input;
 
     random_device rd;
     mt19937 g(rd());// 랜덤
@@ -61,8 +65,7 @@ void TableGenerator::generateTable (Table &table) // query로 처리된 courseDB에 �
     shuffle(courses.begin(), courses.end(), g);
     for (Course &course : courses) // 나머지 과목 처리
     {
-        if (totalGrade >=
-            currentGrade + course.get_grade()) // 설정한 총 학점 수 보다 현재 학점 + course의 학점이 더 작거나 같을 경우
+        if (totalGrade >= currentGrade + course.get_grade()) // 설정한 총 학점 수 보다 현재 학점 + course의 학점이 더 작거나 같을 경우
         {
             if (this->findTime(course) && findCourse(course)) // 시간이 겹치지 않을 경우
             {
