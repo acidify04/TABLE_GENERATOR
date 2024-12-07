@@ -35,9 +35,8 @@ std::string convert_wstr_to_str(std::wstring wstr) // wstringŸ���� utf-
     return str;
 }
 
-std::wstring convert_str_to_wstr(
-    const std::string &str) // �ѱ��� ���ԵȰ��?�����ڵ��?��ȯ��
-                            // �۾��ؾ��ϹǷ� wstringŸ������ ��ȯ�մϴ�.
+std::wstring convert_str_to_wstr(const std::string &str) // �ѱ��� ���ԵȰ��?�����ڵ��?��ȯ��
+                                                         // �۾��ؾ��ϹǷ� wstringŸ������ ��ȯ�մϴ�.
 {
     size_t size = str.size() * MB_CUR_MAX + 1;
     wchar_t *wchars = new wchar_t[size];
@@ -392,7 +391,6 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
                     name_matched_courses = std::move(intersection);
                 }
             }
-            name_matched_courses.insert(name_index.at(token).begin(), name_index.at(token).end());
         }
         CoursePtrSet intersection;
         std::set_intersection(matched_courses.begin(), matched_courses.end(), name_matched_courses.begin(),
@@ -406,8 +404,7 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
     {
         bool is_matched = true;
 
-        if (condition.user_year <
-            course_ptr->get_minimum_year()) // �ּ� �̼��г� ���ǿ� �´��� Ȯ��
+        if (condition.user_year < course_ptr->get_minimum_year()) // �ּ� �̼��г� ���ǿ� �´��� Ȯ��
             is_matched = false;
 
         if (is_matched && !condition.departments.empty()) // �μ� ���ǿ� �´��� Ȯ����
@@ -426,8 +423,7 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
 
         if (is_matched && !condition.types.empty()) // ���� ���� ���ǿ� �´��� Ȯ��
         {
-            is_matched = condition.types.find(course_ptr->get_type()) !=
-                         condition.types.end(); // O(logn)�� Ž���ð� �ҿ�
+            is_matched = condition.types.find(course_ptr->get_type()) != condition.types.end(); // O(logn)�� Ž���ð� �ҿ�
         }
 
         if (is_matched)
