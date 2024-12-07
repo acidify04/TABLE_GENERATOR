@@ -3,6 +3,7 @@
 //#include "schedule_management.h"
 #include "table_db.h"
 #include <conio.h>
+#include <cstdlib> // system() 함수 사용
 #include <iostream>
 #include <string>
 #include "table_db.h"
@@ -21,6 +22,7 @@ int main()
     TableGenerator tableGenerator(courseDatabase, tableDatabase);
     
     Display display(courseDatabase, tableDatabase, tableGenerator);
+
 
     display.mainMenu();
 

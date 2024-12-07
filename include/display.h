@@ -41,15 +41,13 @@ class Display
     Table table;
     User user;
 
+
     public:
     Display(CourseDatabase &courseDatabase, TableDatabase &tableDatabase, TableGenerator &tableGenerator);
-    void addCourse(const string &course);
-    void addDay(const string &day);
-    void removeCourse(int index);
-    void removeDay(int index);
     void display();
     void createSchedule();
-    void searchAndModifySchedule();
+    void searchAll();
+    void searchCourse();
     void setupUser();
     void mainMenu();
 };

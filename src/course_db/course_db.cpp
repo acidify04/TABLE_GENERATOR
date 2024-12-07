@@ -7,7 +7,7 @@
 #include <iostream>
 #include <iterator>
 
-#define TokenLength 2
+#define TokenLength 1
 
 bool DateIndexKey::operator==(const DateIndexKey &key) const
 {
@@ -20,12 +20,12 @@ std::size_t DateIndexKeyHash::operator()(const DateIndexKey &key) const
            (std::hash<std::string>()(encode_weekday(key.weekday)) << 2) ^ (std::hash<int>()(key.time) << 3);
 }
 
-std::string convert_wstr_to_str(std::wstring wstr) // wstringÅ¸ÀÔÀ» utf-8 stringÀ¸·Î º¯È¯ÇÕ´Ï´Ù.
+std::string convert_wstr_to_str(std::wstring wstr) // wstringÅ¸ï¿½ï¿½ï¿½ï¿½ utf-8 stringï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½.
 {
     const size_t size = wstr.size() * MB_CUR_MAX + 1;
     char *new_str = new char[size];
     size_t converted = std::wcstombs(new_str, wstr.c_str(), size);
-    if (converted == -1)
+    if (converted == (size_t)-1)
     {
         delete[] new_str;
         return "";
@@ -35,13 +35,12 @@ std::string convert_wstr_to_str(std::wstring wstr) // wstringÅ¸ÀÔÀ» utf-8 string
     return str;
 }
 
-std::wstring convert_str_to_wstr(const std::string &str) // ÇÑ±ÛÀÌ Æ÷ÇÔµÈ°æ¿ì À¯´ÏÄÚµå·Î º¯È¯ÇØ ÀÛ¾÷ÇØ¾ßÇÏ¹Ç·Î wstringÅ¸ÀÔÀ¸·Î º¯È¯ÇÕ´Ï´Ù.
+std::wstring convert_str_to_wstr(const std::string &str) // ï¿½Ñ±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÔµÈ°ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½?ï¿½ï¿½È¯ï¿½ï¿½
+                                                         // ï¿½Û¾ï¿½ï¿½Ø¾ï¿½ï¿½Ï¹Ç·ï¿½ wstringÅ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½.
 {
-    size_t size = str.size() + 1;
+    size_t size = str.size() * MB_CUR_MAX + 1;
     wchar_t *wchars = new wchar_t[size];
-
-    std::mbstowcs(wchars, str.c_str(), size);
-
+    size_t result = std::mbstowcs(wchars, str.c_str(), size);
     std::wstring wstr = wchars;
     delete[] wchars;
 
@@ -146,7 +145,7 @@ void CourseDatabase::load_date_index(bool is_update)
         if (index_tag.is_success && index_tag == "index")
         {
             point_of_input = index_tag.value.begin();
-            DateIndexKey key;
+            DateIndexKey key = {};
             CoursePtrSet course_ptr_set;
             for (; point_of_input != index_tag.value.end(); point_of_input++)
             {
@@ -383,7 +382,18 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
         for (const auto &token : search_tokens)
         {
             if (name_index.count(token))
-                name_matched_courses.insert(name_index.at(token).begin(), name_index.at(token).end());
+            {
+                if (name_matched_courses.empty())
+                    name_matched_courses.insert(name_index.at(token).begin(), name_index.at(token).end());
+                else
+                {
+                    CoursePtrSet intersection;
+                    std::set_intersection(name_matched_courses.begin(), name_matched_courses.end(),
+                                          name_index.at(token).begin(), name_index.at(token).end(),
+                                          std::inserter(intersection, intersection.begin()));
+                    name_matched_courses = std::move(intersection);
+                }
+            }
         }
         CoursePtrSet intersection;
         std::set_intersection(matched_courses.begin(), matched_courses.end(), name_matched_courses.begin(),
@@ -398,10 +408,10 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
     {
         bool is_matched = true;
 
-        if (condition.user_year < course_ptr->get_minimum_year()) // ÃÖ¼Ò ÀÌ¼öÇÐ³â Á¶°Ç¿¡ ¸Â´ÂÁö È®ÀÎ
+        if (condition.user_year < course_ptr->get_minimum_year()) // ï¿½Ö¼ï¿½ ï¿½Ì¼ï¿½ï¿½Ð³ï¿½ ï¿½ï¿½ï¿½Ç¿ï¿½ ï¿½Â´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
             is_matched = false;
 
-        if (is_matched && !condition.departments.empty()) // ºÎ¼­ Á¶°Ç¿¡ ¸Â´ÂÁö È®¤·´Ï
+        if (is_matched && !condition.departments.empty()) // ï¿½Î¼ï¿½ ï¿½ï¿½ï¿½Ç¿ï¿½ ï¿½Â´ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½ï¿½
         {
             std::set<Department> departments = course_ptr->get_departments();
             if (!std::includes(condition.departments.begin(), condition.departments.end(), departments.begin(),
@@ -409,14 +419,15 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
                 is_matched = false;
         }
 
-        if (is_matched && !condition.professors.empty()) // ±³¼ö Á¶°Ç¿¡ ¸Â´ÂÁö È®ÀÎ
+        if (is_matched && !condition.professors.empty()) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ç¿ï¿½ ï¿½Â´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
         {
-            is_matched = condition.professors.find(course_ptr->get_professor()) != condition.professors.end(); // O(logn) Å½»ö½Ã°£ ¼Ò¿ä
+            is_matched = condition.professors.find(course_ptr->get_professor()) !=
+                         condition.professors.end(); // O(logn) Å½ï¿½ï¿½ï¿½Ã°ï¿½ ï¿½Ò¿ï¿½
         }
 
-        if (is_matched && !condition.types.empty()) // °­ÀÇ À¯Çü Á¶°Ç¿¡ ¸Â´ÂÁö È®ÀÎ
+        if (is_matched && !condition.types.empty()) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ç¿ï¿½ ï¿½Â´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
         {
-            is_matched = condition.types.find(course_ptr->get_type()) != condition.types.end(); // O(logn)ÀÇ Å½»ö½Ã°£ ¼Ò¿ä
+            is_matched = condition.types.find(course_ptr->get_type()) != condition.types.end(); // O(logn)ï¿½ï¿½ Å½ï¿½ï¿½ï¿½Ã°ï¿½ ï¿½Ò¿ï¿½
         }
 
         if (is_matched)

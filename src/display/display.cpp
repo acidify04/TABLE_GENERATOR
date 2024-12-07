@@ -26,12 +26,6 @@ void Display::display()
     // 요일과 시간에 따라 강의를 매핑할 맵 (요일별로 시간 매핑)
     std::map<Weekday, std::map<Time, std::string>> schedule;
 
-    CourseQuery query;
-    query.departments.insert(Department::ComputerScience);
-    query.user_year = 2;
-    tableGenerator.setQuery(query);
-    tableGenerator.generateTable(table);
-
     vector<Course> courseList = table.get_course();
 
     // 요일을 문자열로 변환하기 위한 배열
@@ -315,14 +309,66 @@ void Display::createSchedule()
     tableGenerator.setQuery(query);
     tableGenerator.generateTable(table);
 
-
+    display();
 
 }
 
-
-void searchAndModifySchedule()
+void Display::searchAll()
 {
-    // 시간표 검색 후 수정 부분은 아직 미구현
+    CourseQuery query;
+    query.user_year = 0;
+    query.departments.insert(Department::ComputerScience);
+    vector<Course> courseList = courseDatabase.query(query);
+
+    std::cout << std::left // 왼쪽 정렬
+              << std::setw(15) << "과목 코드" << std::setw(50) << "과목명" << std::setw(20) << "담당 교수"
+              << "\n";
+    std::cout << std::string(65, '-') << "\n"; // 구분선
+
+    // 각 과목 정보 출력
+    for (const Course &course : courseList)
+    {
+        std::cout << std::left << std::setw(15) << course.get_id() << std::setw(50) << course.get_name()
+                  << std::setw(20) << course.get_professor() << "\n";
+    }
+
+    int input;
+
+    cin >> input;
+}
+
+void Display::searchCourse()
+{
+
+    CourseQuery query;
+
+    query.user_year = 0;
+    query.departments.insert(Department::ComputerScience);
+
+    // 선택 필드 입력
+    std::cout << "Enter course name (or leave blank): ";
+    std::cin.ignore(); // 버퍼 비우기
+    std::getline(std::cin, query.name);
+
+    query.name = "소공";
+
+    vector<Course> courseList = courseDatabase.query(query);
+
+    std::cout << std::left // 왼쪽 정렬
+              << std::setw(15) << "과목 코드" << std::setw(50) << "과목명" << std::setw(20) << "담당 교수"
+              << "\n";
+    std::cout << std::string(65, '-') << "\n"; // 구분선
+
+    // 각 과목 정보 출력
+    for (const Course &course : courseList)
+    {
+        std::cout << std::left << std::setw(15) << course.get_id() << std::setw(50) << course.get_name()
+                  << std::setw(20) << course.get_professor() << "\n";
+    }
+
+    int input;
+
+    cin >> input;
 }
 
 void Display::setupUser()
@@ -373,7 +419,7 @@ void Display::mainMenu()
     while (true)
     {
         system("cls");
-        cout << "[MainMenu]\n1. User Setup\n2. Create Schedule\n3. Search and Modify Schedule\n4. Exit\nSelect: ";
+        cout << "[MainMenu]\n1. User Setup\n2. Create Schedule\n3. SearchAll\n4. SearchOne\nSelect: ";
         cin >> choice;
         cin.ignore();
 
@@ -387,17 +433,13 @@ void Display::mainMenu()
             system("cls");
             createSchedule();
             break;
-        //case 3:
-        //    system("cls");
-        //    searchAndModifySchedule();
-        //    break;
-        //case 4:
-        //    system("cls");
-        //    cout << "Exiting the program." << endl;
-        //    return;
         case 3:
             system("cls");
-            display();
+            searchAll();
+            break;
+        case 4:
+            system("cls");
+            searchCourse();
             break;
         default:
             cout << "Please select a valid option." << endl;

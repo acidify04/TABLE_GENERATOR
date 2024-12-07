@@ -15,15 +15,6 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
 {
     vector<Course> courses = courseDB.query(query); // °­ÀÇ¸ñ·Ï »ý¼º
 
-    for (int i = 0; i < courses.size(); i++)
-    {
-        courses[i].grade = 2;
-    }
-
-    totalGrade = 20;
-
-
-
     random_device rd;
     mt19937 g(rd());// ·£´ý
 
@@ -32,11 +23,13 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
     this->time.clear(); // ÇÐÁ¡ ³ÖÀº °ú¸ñ, ½Ã°£ ÃÊ±âÈ­
 
     shuffle(courses.begin(), courses.end(), g); // courseÀÇ ¼ø¼­¸¦ ¼¯À½
+
     if (!query.name.empty() && !courses.empty()) // Æ¯Á¤°ú¸ñÀÌ ÀÖ´Â °æ¿ì (vector°¡ ºñ¾îÀÖÁö ¾ÊÀ» °æ¿ì)
     {
         table.insert_course(courses[0]);
         this->existCourse.insert(courses[0].get_name());
         this->currentGrade += courses[0].get_grade();
+
     }
 
     query.name.clear();
@@ -63,13 +56,6 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
 
     courses = this->courseDB.query(this->query);
 
-    
-    for (int i = 0; i < courses.size(); i++)
-    {
-        courses[i].grade = 2;
-    }
-
-
     shuffle(courses.begin(), courses.end(), g);
     for (Course &course : courses) // ³ª¸ÓÁö °ú¸ñ Ã³¸®
     {
@@ -82,11 +68,6 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
                 this->currentGrade += course.get_grade(); // ÇöÀç ÃÑ ÇÐÁ¡¼ö¸¦ °­ÀÇÀÇ ÇÐÁ¡¸¸Å­ Áõ°¡
             }
         }
-    }
-
-    for (auto course : table.get_course())
-    {
-        cout << course.get_name() << '\n';
     }
 
     this->tableDB.insert(table);
