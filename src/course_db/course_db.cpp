@@ -390,6 +390,7 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
 
     // query by departments, professors
     std::vector<Course> result;
+
     for (const auto course_ptr : matched_courses)
     {
         bool is_matched = true;

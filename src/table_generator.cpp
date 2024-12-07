@@ -11,10 +11,16 @@ TableGenerator::TableGenerator(CourseDatabase &courseDB, TableDatabase &tableDB)
 {
 }
 
-void TableGenerator::generateTable(
-    Table &table) // query로 처리된 courseDB에 있는 course중 greedyAloghrithm으로 시간표 생성
+void TableGenerator::generateTable (Table &table) // query로 처리된 courseDB에 있는 course중 greedyAloghrithm으로 시간표 생성
 {
-    vector<Course> courses = this->courseDB.query(this->query); // 강의목록 생성
+    vector<Course> courses = courseDB.query(query); // 강의목록 생성
+   
+    cout << "왜 안돼 \n";
+
+    for (Course a : courses){
+        std::cout << a.get_name() << '\n';
+    }
+
     random_device rd;
     mt19937 g(rd());// 랜덤
 
