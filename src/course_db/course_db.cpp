@@ -170,6 +170,7 @@ void CourseDatabase::load_date_index(bool is_update)
                     }
                 }
             }
+
             date_index[key].insert(course_ptr_set.begin(), course_ptr_set.end());
         }
     }
@@ -365,8 +366,10 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
             for (auto week : week_query)
             {
                 const DateIndexKey &key = {condition.year, condition.semester, week, time};
+
                 if (date_index.count(key) > 0)
                     matched_courses.insert(date_index.at(key).begin(), date_index.at(key).end());
+
             }
         }
     }
@@ -400,6 +403,7 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
 
     // query by departments, professors
     std::vector<Course> result;
+
     for (const auto course_ptr : matched_courses)
     {
         bool is_matched = true;

@@ -11,10 +11,10 @@ TableGenerator::TableGenerator(CourseDatabase &courseDB, TableDatabase &tableDB)
 {
 }
 
-void TableGenerator::generateTable(
-    Table &table) // query로 처리된 courseDB에 있는 course중 greedyAloghrithm으로 시간표 생성
+void TableGenerator::generateTable (Table &table) // query로 처리된 courseDB에 있는 course중 greedyAloghrithm으로 시간표 생성
 {
-    vector<Course> courses = this->courseDB.query(this->query); // 강의목록 생성
+    vector<Course> courses = courseDB.query(query); // 강의목록 생성
+
     random_device rd;
     mt19937 g(rd());// 랜덤
 
@@ -23,16 +23,19 @@ void TableGenerator::generateTable(
     this->time.clear(); // 학점 넣은 과목, 시간 초기화
 
     shuffle(courses.begin(), courses.end(), g); // course의 순서를 섞음
+
     if (!query.name.empty() && !courses.empty()) // 특정과목이 있는 경우 (vector가 비어있지 않을 경우)
     {
         table.insert_course(courses[0]);
         this->existCourse.insert(courses[0].get_name());
         this->currentGrade += courses[0].get_grade();
+
     }
 
     query.name.clear();
     courses = this->courseDB.query(this->query);
     shuffle(courses.begin(), courses.end(), g);
+
     if (!query.professors.empty() && !courses.empty()) // 우선순위 교수 처리
     {
         for (Course &course : courses)
@@ -52,11 +55,11 @@ void TableGenerator::generateTable(
     }
 
     courses = this->courseDB.query(this->query);
+
     shuffle(courses.begin(), courses.end(), g);
     for (Course &course : courses) // 나머지 과목 처리
     {
-        if (totalGrade >=
-            currentGrade + course.get_grade()) // 설정한 총 학점 수 보다 현재 학점 + course의 학점이 더 작거나 같을 경우
+        if (totalGrade >= currentGrade + course.get_grade()) // 설정한 총 학점 수 보다 현재 학점 + course의 학점이 더 작거나 같을 경우
         {
             if (this->findTime(course) && findCourse(course)) // 시간이 겹치지 않을 경우
             {
@@ -66,6 +69,7 @@ void TableGenerator::generateTable(
             }
         }
     }
+
     this->tableDB.insert(table);
 }
 

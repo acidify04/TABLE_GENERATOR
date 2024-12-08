@@ -16,16 +16,23 @@ class Table
     std::vector<Course> get_course() const;
     bool is_satisfy(TableQuery tableQuery) const;
     std::string encode();
+    Table();
     Table(const std::string &str);
     Table(int iid, int iuser_id, std::string iname, std::vector<Course> icourses, int iyear, Semester isemester);
     ~Table();
 
     Semester get_semester() const;
-    int get_year() const;
     //vector<Course>& get_courses() const;
     std::string get_name() const;
+    int get_year() const;
     int get_user_id() const;
     int get_id() const;
+
+    void set_semester(Semester semester);
+    void set_name(std::string name);
+    void set_year(int year);
+    void set_user_id(int user_id);
+    void set_id(int id);
 
   private:
     Semester semester;

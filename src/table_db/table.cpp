@@ -109,6 +109,11 @@ Table::Table(const string &str){
     }
 }
 
+// NoargsConstructor
+Table::Table()
+{
+}
+
 // AllArgsConstructor
 Table::Table(int iid, int iuser_id, std::string iname, std::vector<Course> icourses, int iyear, Semester isemester) {
     id = iid;
@@ -118,6 +123,7 @@ Table::Table(int iid, int iuser_id, std::string iname, std::vector<Course> icour
     year = iyear;
     semester = isemester;
 }
+
 
 Table::~Table() { }
 
@@ -142,3 +148,24 @@ int Table::get_user_id() const {
 int Table::get_id() const {
     return id;
 }
+
+void Table::set_semester(Semester semester)
+{
+    this->semester = semester;
+};
+void Table::set_name(string name)
+{
+    this->name = name;
+};
+void Table::set_year(int year)
+{
+    this->year = year;
+};
+void Table::set_user_id(int user_id)
+{
+    this->user_id = user_id;
+};
+void Table::set_id(int id)
+{
+    this->id = id;
+};
