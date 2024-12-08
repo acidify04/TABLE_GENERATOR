@@ -11,21 +11,20 @@ TableGenerator::TableGenerator(CourseDatabase &courseDB, TableDatabase &tableDB)
 {
 }
 
-void TableGenerator::generateTable(
-    Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ ÀÖ´Â courseÁß greedyAloghrithmÀ¸·Î ½Ã°£Ç¥ »ý¼º
+void TableGenerator::generateTable(Table &table) // queryï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ courseDBï¿½ï¿½ ï¿½Ö´ï¿½ courseï¿½ï¿½ greedyAloghrithmï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½
 {
-    vector<Course> courses = courseDB.query(query); // °­ÀÇ¸ñ·Ï »ý¼º
+    vector<Course> courses = courseDB.query(query); // ï¿½ï¿½ï¿½Ç¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     random_device rd;
-    mt19937 g(rd()); // ·£´ý
+    mt19937 g(rd()); // ï¿½ï¿½ï¿½ï¿½
 
     this->currentGrade = 0;
     this->existCourse.clear();
-    this->time.clear(); // ÇÐÁ¡ ³ÖÀº °ú¸ñ, ½Ã°£ ÃÊ±âÈ­
+    this->time.clear(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½Ã°ï¿½ ï¿½Ê±ï¿½È­
 
-    shuffle(courses.begin(), courses.end(), g); // courseÀÇ ¼ø¼­¸¦ ¼¯À½
+    shuffle(courses.begin(), courses.end(), g); // courseï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    if (!query.name.empty() && !courses.empty()) // Æ¯Á¤°ú¸ñÀÌ ÀÖ´Â °æ¿ì (vector°¡ ºñ¾îÀÖÁö ¾ÊÀ» °æ¿ì)
+    if (!query.name.empty() && !courses.empty()) // Æ¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ (vectorï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½)
     {
         table.insert_course(courses[0]);
         this->existCourse.insert(courses[0].get_name());
@@ -36,7 +35,7 @@ void TableGenerator::generateTable(
     courses = this->courseDB.query(this->query);
     shuffle(courses.begin(), courses.end(), g);
 
-    if (!query.professors.empty() && !courses.empty()) // ¿ì¼±¼øÀ§ ±³¼ö Ã³¸®
+    if (!query.professors.empty() && !courses.empty()) // ï¿½ì¼±ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     {
         for (Course &course : courses)
         {
@@ -50,21 +49,22 @@ void TableGenerator::generateTable(
                 }
             }
         }
+        query.professors.clear();
     }
 
     courses = this->courseDB.query(this->query);
 
     shuffle(courses.begin(), courses.end(), g);
-    for (Course &course : courses) // ³ª¸ÓÁö °ú¸ñ Ã³¸®
+    for (Course &course : courses) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     {
         if (totalGrade >=
-            currentGrade + course.get_grade()) // ¼³Á¤ÇÑ ÃÑ ÇÐÁ¡ ¼ö º¸´Ù ÇöÀç ÇÐÁ¡ + courseÀÇ ÇÐÁ¡ÀÌ ´õ ÀÛ°Å³ª °°À» °æ¿ì
+            currentGrade + course.get_grade()) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ + courseï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Û°Å³ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         {
-            if (this->findTime(course) && findCourse(course)) // ½Ã°£ÀÌ °ãÄ¡Áö ¾ÊÀ» °æ¿ì
+            if (this->findTime(course) && findCourse(course)) // ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             {
-                table.insert_course(course); // ½Ã°£Ç¥¿¡ °­ÀÇ Ãß°¡
+                table.insert_course(course); // ï¿½Ã°ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
                 this->existCourse.insert(course.get_name());
-                this->currentGrade += course.get_grade(); // ÇöÀç ÃÑ ÇÐÁ¡¼ö¸¦ °­ÀÇÀÇ ÇÐÁ¡¸¸Å­ Áõ°¡
+                this->currentGrade += course.get_grade(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å­ ï¿½ï¿½ï¿½ï¿½
             }
         }
     }
@@ -77,26 +77,26 @@ void TableGenerator::setQuery(CourseQuery query)
     this->query = query;
 }
 
-void TableGenerator::setTotalGrade(int grade) // »ý¼ºÇÒ ½Ã°£Ç¥ÀÇ ÃÑ ÇÐÁ¡¼ö ¼³Á¤
+void TableGenerator::setTotalGrade(int grade) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 {
     this->totalGrade = grade;
 }
 
-bool TableGenerator::findTime(Course course) // °ãÄ¡´Â ½Ã°£ ÀÖ´ÂÁö È®ÀÎ
+bool TableGenerator::findTime(Course course) // ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 {
     for (const CourseTime availableTime : course.get_times())
     {
         for (const CourseTime existingTime : this->time)
         {
             if (availableTime.weekday == existingTime.weekday &&
-                availableTime.time == existingTime.time) // °ãÄ¡´Â ½Ã°£ÀÌ ÀÖ´Â °æ¿ì
+                availableTime.time == existingTime.time) // ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½
             {
                 return false;
             }
         }
     }
 
-    for (const CourseTime availableTime : course.get_times()) // ½Ã°£Ç¥¿¡ ÇÒ´çµÈ ½Ã°£À» ±â·Ï
+    for (const CourseTime availableTime : course.get_times()) // ï¿½Ã°ï¿½Ç¥ï¿½ï¿½ ï¿½Ò´ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     {
         this->time.push_back(availableTime);
     }
@@ -104,7 +104,7 @@ bool TableGenerator::findTime(Course course) // °ãÄ¡´Â ½Ã°£ ÀÖ´ÂÁö È®ÀÎ
     return true;
 }
 
-bool TableGenerator::findCourse(Course course) // °°Àº °ú¸ñ ¾Èµé¾î°¡µµ·Ï ¼³Á¤
+bool TableGenerator::findCourse(Course course) // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Èµï¿½î°¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 {
     if (this->existCourse.find(course.get_name()) != this->existCourse.end())
     {
