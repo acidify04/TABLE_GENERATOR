@@ -13,25 +13,12 @@ using namespace std;
 
 int main()
 {
-    //std::cout << "Hello World!" << std::endl;
-    /*CourseDatabase courseDB;
-    courseDB.load();
-    TableDatabase db;
-    CourseQuery query = {Semester::Fall, 2024, 3, "", {}, {}, {}, {}};
+    CourseDatabase courseDatabase;
+    TableDatabase tableDatabase;
+    TableGenerator tableGenerator(courseDatabase, tableDatabase);
 
-    Table table("sample id");
-    TableGenerator table_generator(courseDB, db);
-    table_generator.setTotalGrade(20);
-    table_generator.setQuery(query);
-    table_generator.generateTable(table);
+    //Display display(courseDatabase, tableDatabase, tableGenerator);
 
-    for (Course course : table.get_course())
-    {
-        cout << course.get_name() << endl;
-    }*/
-    CourseDatabase courseDB;
-    TableDatabase tableDB;
-    courseDB.load();
     mainMenu();
     
     return 0;
