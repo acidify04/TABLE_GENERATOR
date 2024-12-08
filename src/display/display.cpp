@@ -44,6 +44,22 @@ void Display::display()
                 rows[Weekday::Fri], rows[Weekday::Sat]});
 }
 
+void Display::searchSchedule()
+{
+    std::vector<Table> tables = tableDatabase.get_tables();
+    std::optional<Table> selected_table;
+    do
+    {
+        selected_table = select_one(
+            tables, [](Table table) { return "Scehdule "; }, "Select schedule");
+        if (selected_table.has_value())
+        {
+            table = &selected_table.value();
+            display();
+        }
+    } while (selected_table.has_value());
+}
+
 void Display::createSchedule()
 {
     system("cls");
@@ -154,7 +170,8 @@ void Display::createSchedule()
     tableGenerator.setTotalGrade(selected_credit);
     tableGenerator.setQuery(query);
     tableGenerator.generateTable(*table);
-
+    tableDatabase.insert(*table);
+    tableDatabase.save();
     display();
 }
 
@@ -294,7 +311,7 @@ void Display::mainMenu()
     while (true)
     {
         std::optional<int> choice = select_one(
-            std::vector<int>{1, 2, 3, 4},
+            std::vector<int>{1, 2, 3, 4, 5},
             [](int menu) {
                 switch (menu)
                 {
@@ -303,8 +320,10 @@ void Display::mainMenu()
                 case 2:
                     return "Create schedule";
                 case 3:
-                    return "Search course";
+                    return "Search schedule";
                 case 4:
+                    return "Search course";
+                case 5:
                     return "Quit";
                 default:
                     return "";
@@ -325,9 +344,13 @@ void Display::mainMenu()
                 break;
             case 3:
                 system("cls");
-                searchCourse();
+                searchSchedule();
                 break;
             case 4:
+                system("cls");
+                searchCourse();
+                break;
+            case 5:
                 return;
             default:
                 cout << "Please select a valid option." << endl;

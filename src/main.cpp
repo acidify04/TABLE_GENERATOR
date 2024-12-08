@@ -4,7 +4,7 @@
 #include "table_db.h"
 #include "table_generator.h"
 #include <conio.h>
-#include <cstdlib> // system() ÇÔ¼ö »ç¿ë
+#include <cstdlib> // system() ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½
 #include <iostream>
 #include <string>
 
@@ -16,6 +16,7 @@ int main()
     CourseDatabase courseDatabase;
     TableDatabase tableDatabase;
     courseDatabase.load();
+    tableDatabase.load();
 
     TableGenerator tableGenerator(courseDatabase, tableDatabase);
 
