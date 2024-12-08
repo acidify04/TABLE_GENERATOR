@@ -7,6 +7,7 @@
 #include <conio.h>
 #include <iostream>
 #include <set>
+#include <iomanip>
 
 #define UP 72
 #define DOWN 80
@@ -111,6 +112,54 @@ std::string get_input(const std::string &prompt)
     std::cout << prompt;
     std::getline(std::cin, input);
     return input;
+}
+
+struct ColumnItem
+{
+    std::string column;
+};
+
+struct RowItem
+{
+    std::string row;
+    std::vector<std::string> columns;
+};
+
+void draw_table(std::string title, std::vector<ColumnItem> column, std::vector<RowItem> rows)
+{
+    size_t column_width = 10; // 기본 최소 너비
+    for (const auto& col : column) {
+        column_width = std::max(column_width, col.column.length());
+    }
+    for (const auto& row : rows) {
+        column_width = std::max(column_width, row.row.length());
+        for (const auto& cell : row.columns) {
+            column_width = std::max(column_width, cell.length());
+        }
+    }
+
+    size_t table_width = column_width * (column.size() + 1) + column.size();
+
+    std::cout << "\n" << std::string(table_width, '=') << "\n";
+    std::cout << std::setw((table_width + title.length()) / 2) << title << "\n";
+    std::cout << std::string(table_width, '=') << "\n";
+
+    std::cout << std::setw(column_width) << ""; // Row 부분
+    for (const auto& col : column) {
+        std::cout << std::setw(column_width + 1) << std::left << col.column;
+    }
+    std::cout << "\n";
+    std::cout << std::string(table_width, '-') << "\n";
+
+    for (const auto& row : rows) {
+        std::cout << std::setw(column_width) << row.row;
+        for (const auto& cell : row.columns) {
+            std::cout << std::setw(column_width + 1) << std::left << cell;
+        }
+        std::cout << "\n";
+    }
+
+    std::cout << std::string(table_width, '=') << "\n";
 }
 
 #endif
