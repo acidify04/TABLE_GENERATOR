@@ -26,7 +26,7 @@ void Display::display()
     // 요일과 시간에 따라 강의를 매핑할 맵 (요일별로 시간 매핑)
     std::map<Weekday, std::map<Time, std::string>> schedule;
 
-    vector<Course> courseList = table.get_course();
+    vector<Course> courseList = table->get_course();
 
     // 요일을 문자열로 변환하기 위한 배열
     std::vector<std::string> daysOfWeek = {"Mon", "Tue", "Wed", "Thu", "Fri"};
@@ -92,6 +92,8 @@ void Display::createSchedule()
     vector<Course> courses = courseDatabase.query({});
     CourseQuery query;
 
+    table = new Table();
+
     int input;
 
     if (courses.empty())
@@ -102,7 +104,7 @@ void Display::createSchedule()
 
     cout << "Enter the year for the schedule (e.g., 2023, 2024): ";
     cin >> input;
-    table.set_year(input);
+    table->set_year(input);
     query.year = input;
     query.user_year = user.year;
     cin.ignore();
@@ -129,19 +131,19 @@ void Display::createSchedule()
     switch (input)
     {
     case 1:
-        table.set_semester(Semester::Spring);
+        table->set_semester(Semester::Spring);
         query.semester = Semester::Spring;
         break;
     case 2:
-        table.set_semester(Semester::Summer);
+        table->set_semester(Semester::Summer);
         query.semester = Semester::Summer;
         break;
     case 3:
-        table.set_semester(Semester::Fall);
+        table->set_semester(Semester::Fall);
         query.semester = Semester::Fall;
         break;
     case 4:
-        table.set_semester(Semester::Winter);
+        table->set_semester(Semester::Winter);
         query.semester = Semester::Winter;
         break;
     }
@@ -307,7 +309,7 @@ void Display::createSchedule()
 
     tableGenerator.setTotalGrade(input);
     tableGenerator.setQuery(query);
-    tableGenerator.generateTable(table);
+    tableGenerator.generateTable(*table);
 
     display();
 

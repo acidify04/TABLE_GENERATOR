@@ -38,7 +38,7 @@ class Display
     CourseDatabase courseDatabase;
     TableDatabase tableDatabase;
     TableGenerator tableGenerator;
-    Table table;
+    Table* table;
     User user;
 
 
