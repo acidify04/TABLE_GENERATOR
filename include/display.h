@@ -46,7 +46,6 @@ class Display
     Display(CourseDatabase &courseDatabase, TableDatabase &tableDatabase, TableGenerator &tableGenerator);
     void display();
     void createSchedule();
-    void searchAll();
     void searchCourse();
     void setupUser();
     void mainMenu();

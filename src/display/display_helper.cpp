@@ -43,7 +43,9 @@ void draw_table(std::string title, std::vector<ColumnItem> column, std::vector<R
     size_t column_width = 15; // 기본 최소 너비
 
     size_t visible_columns = 5; // 최대 열
+    size_t visible_row = 10;
     size_t start_column = 0;
+    size_t start_row = 0;
     size_t table_width = column_width * (visible_columns + 1) + visible_columns;
     // 테이블 그리는 부분
     while (true)
@@ -60,12 +62,12 @@ void draw_table(std::string title, std::vector<ColumnItem> column, std::vector<R
         }
         std::cout << "\n" << std::string(table_width, '-') << "\n";
 
-        for (const auto &row : rows)
+        for (size_t r = start_row; r < std::min(rows.size(), start_row + visible_row); r++)
         {
-            std::cout << std::setw(column_width) << std::left << row.row;
-            for (size_t i = start_column; i < std::min(row.columns.size(), start_column + visible_columns); i++)
+            std::cout << std::setw(column_width) << std::left << rows[r].row;
+            for (size_t i = start_column; i < std::min(rows[r].columns.size(), start_column + visible_columns); i++)
             {
-                std::cout << std::setw(column_width + 1) << std::left << limited_str(row.columns[i], column_width);
+                std::cout << std::setw(column_width + 1) << std::left << limited_str(rows[r].columns[i], column_width);
             }
             std::cout << "\n";
         }
@@ -83,6 +85,16 @@ void draw_table(std::string title, std::vector<ColumnItem> column, std::vector<R
         {
             if (start_column + visible_columns < column.size())
                 start_column++;
+        }
+        else if (input == DOWN)
+        {
+            if (start_row + visible_row < rows.size())
+                start_row++;
+        }
+        else if (input == UP)
+        {
+            if (start_row > 0)
+                start_row--;
         }
         else if (input == 'q' || input == 'Q')
             return;

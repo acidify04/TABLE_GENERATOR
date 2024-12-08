@@ -158,62 +158,105 @@ void Display::createSchedule()
     display();
 }
 
-void Display::searchAll()
-{
-    CourseQuery query;
-    query.user_year = 0;
-    query.departments = {user.department};
-    vector<Course> courseList = courseDatabase.query(query);
-
-    std::cout << std::left // ���� ����
-              << std::setw(15) << "���� �ڵ�" << std::setw(50) << "�����" << std::setw(20) << "��� ����"
-              << "\n";
-    std::cout << std::string(65, '-') << "\n"; // ���м�
-
-    // �� ���� ���� ���
-    for (const Course &course : courseList)
-    {
-        std::cout << std::left << std::setw(15) << course.get_id() << std::setw(50) << course.get_name()
-                  << std::setw(20) << course.get_professor() << "\n";
-    }
-
-    int input;
-
-    cin >> input;
-}
-
 void Display::searchCourse()
 {
 
     CourseQuery query;
 
-    query.user_year = 0;
-    query.departments.insert(Department::ComputerScience);
+    query.user_year = user.year;
 
-    // ���� �ʵ� �Է�
-    std::cout << "Enter course name (or leave blank): ";
-    std::cin.ignore(); // ���� ����
-    std::getline(std::cin, query.name);
-
-    query.name = "�Ұ�";
-
-    vector<Course> courseList = courseDatabase.query(query);
-
-    std::cout << std::left // ���� ����
-              << std::setw(15) << "���� �ڵ�" << std::setw(50) << "�����" << std::setw(20) << "��� ����"
-              << "\n";
-    std::cout << std::string(65, '-') << "\n"; // ���м�
-
-    // �� ���� ���� ���
-    for (const Course &course : courseList)
+    std::optional<int> selected_year;
+    do
     {
-        std::cout << std::left << std::setw(15) << course.get_id() << std::setw(50) << course.get_name()
-                  << std::setw(20) << course.get_professor() << "\n";
-    }
+        selected_year = select_one(
+            std::vector<int>{2024}, [](int item) { return std::to_string(item); }, "Enter the year for the schedule.");
+    } while (!selected_year.has_value());
 
-    int input;
+    if (selected_year.has_value())
+        query.year = selected_year.value();
 
-    cin >> input;
+    // 학기 설정
+    std::optional<Semester> selected_semester;
+    do
+    {
+        selected_semester = select_one(
+            std::vector<Semester>{Semester::Spring, Semester::Summer, Semester::Fall, Semester::Winter},
+            [](Semester item) {
+                switch (item)
+                {
+                case Semester::Spring:
+                    return "Spring";
+                case Semester::Summer:
+                    return "Summer";
+                case Semester::Fall:
+                    return "Fall";
+                case Semester::Winter:
+                    return "Winter";
+                }
+            },
+            "Select a semester");
+    } while (!selected_semester.has_value());
+    if (selected_semester.has_value())
+        query.semester = selected_semester.value();
+
+    std::string title;
+    std::vector<ColumnItem> columns = {ColumnItem{"Course"}, ColumnItem{"Professor"}, ColumnItem{"Grade"},
+                                       ColumnItem{"Time"}};
+    do
+    {
+        system("cls");
+        title = get_input("Enter course name (or quit): ");
+        if (title == "quit")
+            return;
+        query.name = title;
+
+        vector<Course> result = courseDatabase.query(query);
+        std::string table_title;
+        table_title = "Found " + std::to_string(result.size()) + " courses named \"" + query.name + "\"";
+        std::vector<RowItem> rows;
+        int index = 0;
+        for (const auto &course : result)
+        {
+            index++;
+            RowItem row = {std::to_string(index), {}};
+            row.columns.push_back(course.get_name());
+            row.columns.push_back(course.get_professor());
+            row.columns.push_back(std::to_string(course.get_grade()));
+            std::string time_str;
+            for (const auto &time : course.get_times())
+            {
+                switch (time.weekday)
+                {
+                case Weekday::Mon:
+                    time_str += "Mon-";
+                    break;
+                case Weekday::Tue:
+                    time_str += "Tue-";
+                    break;
+                case Weekday::Wed:
+                    time_str += "Wed-";
+                    break;
+                case Weekday::Thu:
+                    time_str += "Thu-";
+                    break;
+                case Weekday::Fri:
+                    time_str += "Fri-";
+                    break;
+                case Weekday::Sat:
+                    time_str += "Sat-";
+                    break;
+                case Weekday::Sun:
+                    time_str += "Sun-";
+                    break;
+                }
+                time_str += std::to_string(time.time);
+                time_str += " ";
+            }
+            row.columns.push_back(time_str);
+            rows.push_back(row);
+        }
+        draw_table(table_title, columns, rows);
+    } while (title != "quit");
 }
 
 void Display::setupUser()
@@ -251,7 +294,7 @@ void Display::mainMenu()
     while (true)
     {
         std::optional<int> choice = select_one(
-            std::vector<int>{1, 2, 3, 4, 5},
+            std::vector<int>{1, 2, 3, 4},
             [](int menu) {
                 switch (menu)
                 {
@@ -260,10 +303,8 @@ void Display::mainMenu()
                 case 2:
                     return "Create schedule";
                 case 3:
-                    return "Search all";
+                    return "Search course";
                 case 4:
-                    return "Search one";
-                case 5:
                     return "Quit";
                 default:
                     return "";
@@ -284,13 +325,9 @@ void Display::mainMenu()
                 break;
             case 3:
                 system("cls");
-                searchAll();
-                break;
-            case 4:
-                system("cls");
                 searchCourse();
                 break;
-            case 5:
+            case 4:
                 return;
             default:
                 cout << "Please select a valid option." << endl;
