@@ -116,7 +116,7 @@ Course::Course(const std::string &input)
     {
         ParseResult tag = parse_tag(pt, input.end());
         if (!tag.is_success)
-            throw std::runtime_error("Fail to decode course.");
+            throw std::runtime_error("Fail to parse course tag.");
         else if (tag == "time")
             this->times.push_back(decode_coursetime(tag.value));
         else if (tag == "department")
@@ -260,7 +260,7 @@ Department decode_department(const std::string &input)
     case 0:
         return Department::ComputerScience;
     default:
-        throw std::exception(); // Invalid semester value.
+        throw std::runtime_error("Invalid semester value.");
     }
 }
 
