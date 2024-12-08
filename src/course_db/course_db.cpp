@@ -369,7 +369,6 @@ std::vector<Course> CourseDatabase::query(CourseQuery condition) const
 
                 if (date_index.count(key) > 0)
                     matched_courses.insert(date_index.at(key).begin(), date_index.at(key).end());
-
             }
         }
     }

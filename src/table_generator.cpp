@@ -11,12 +11,13 @@ TableGenerator::TableGenerator(CourseDatabase &courseDB, TableDatabase &tableDB)
 {
 }
 
-void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ ÀÖ´Â courseÁß greedyAloghrithmÀ¸·Î ½Ã°£Ç¥ »ý¼º
+void TableGenerator::generateTable(
+    Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ ÀÖ´Â courseÁß greedyAloghrithmÀ¸·Î ½Ã°£Ç¥ »ý¼º
 {
     vector<Course> courses = courseDB.query(query); // °­ÀÇ¸ñ·Ï »ý¼º
 
     random_device rd;
-    mt19937 g(rd());// ·£´ý
+    mt19937 g(rd()); // ·£´ý
 
     this->currentGrade = 0;
     this->existCourse.clear();
@@ -29,7 +30,6 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
         table.insert_course(courses[0]);
         this->existCourse.insert(courses[0].get_name());
         this->currentGrade += courses[0].get_grade();
-
     }
 
     query.name.clear();
@@ -40,9 +40,7 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
     {
         for (Course &course : courses)
         {
-            if (totalGrade >=
-                currentGrade +
-                    course.get_grade())
+            if (totalGrade >= currentGrade + course.get_grade())
             {
                 if (this->findTime(course) && findCourse(course))
                 {
@@ -59,7 +57,8 @@ void TableGenerator::generateTable (Table &table) // query·Î Ã³¸®µÈ courseDB¿¡ À
     shuffle(courses.begin(), courses.end(), g);
     for (Course &course : courses) // ³ª¸ÓÁö °ú¸ñ Ã³¸®
     {
-        if (totalGrade >= currentGrade + course.get_grade()) // ¼³Á¤ÇÑ ÃÑ ÇÐÁ¡ ¼ö º¸´Ù ÇöÀç ÇÐÁ¡ + courseÀÇ ÇÐÁ¡ÀÌ ´õ ÀÛ°Å³ª °°À» °æ¿ì
+        if (totalGrade >=
+            currentGrade + course.get_grade()) // ¼³Á¤ÇÑ ÃÑ ÇÐÁ¡ ¼ö º¸´Ù ÇöÀç ÇÐÁ¡ + courseÀÇ ÇÐÁ¡ÀÌ ´õ ÀÛ°Å³ª °°À» °æ¿ì
         {
             if (this->findTime(course) && findCourse(course)) // ½Ã°£ÀÌ °ãÄ¡Áö ¾ÊÀ» °æ¿ì
             {
