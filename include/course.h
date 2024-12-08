@@ -15,20 +15,20 @@ enum class Weekday
 
 enum class CourseType
 {
-    General_Education, // °øÅë±³¾ç
-    CoreCommunication, // ÇÙ½É-¼ÒÅë
-    CoreCreativity, // ÇÙ½É-Ã¢ÀÇ
-    CoreChallenge, // ÇÙ½É-µµÀü
-    CoreConvergence, // ÇÙ½É-À¶ÇÕ
-    CoreTrust, // ÇÙ½É-½Å·Ú
-    ElectiveCommunication, // ¼±ÅÃ-¼ÒÅë
-    ElectiveCreativity, // ¼±ÅÃ-Ã¢ÀÇ
-    ElectiveChallenge, // ¼±ÅÃ-µµÀü
-    ElectiveConvergence, // ¼±ÅÃ-À¶ÇÕ
-    ElectiveTrust, // ¼±ÅÃ-½Å·Ú
-    Major, // Àü°ø
-    MajorRequired, // Àü°øÇÊ¼ö
-    MajorFundamental // Àü°ø±âÃÊ
+    General_Education, // ï¿½ï¿½ï¿½ë±³ï¿½ï¿½
+    CoreCommunication, // ï¿½Ù½ï¿½-ï¿½ï¿½ï¿½ï¿½
+    CoreCreativity, // ï¿½Ù½ï¿½-Ã¢ï¿½ï¿½
+    CoreChallenge, // ï¿½Ù½ï¿½-ï¿½ï¿½ï¿½ï¿½
+    CoreConvergence, // ï¿½Ù½ï¿½-ï¿½ï¿½ï¿½ï¿½
+    CoreTrust, // ï¿½Ù½ï¿½-ï¿½Å·ï¿½
+    ElectiveCommunication, // ï¿½ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½
+    ElectiveCreativity, // ï¿½ï¿½ï¿½ï¿½-Ã¢ï¿½ï¿½
+    ElectiveChallenge, // ï¿½ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½
+    ElectiveConvergence, // ï¿½ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½
+    ElectiveTrust, // ï¿½ï¿½ï¿½ï¿½-ï¿½Å·ï¿½
+    Major, // ï¿½ï¿½ï¿½ï¿½
+    MajorRequired, // ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½
+    MajorFundamental // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 };
 
 enum class Department
@@ -72,19 +72,19 @@ int grade;
     std::string encode() const;
 
     int get_id() const;
-    // ÇÐÁ¡¼ö¸¦ ¾ò½À´Ï´Ù.
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.
     int get_grade() const;
-    // ÀÌ¼ö°¡´ÉÇÑ ÃÖ¼ÒÇÐ³âÀÔ´Ï´Ù. 0ÀÌ¸é ¸ðµç ÇÐ³âÀÌ ÀÌ¼ö°¡´ÉÇÕ´Ï´Ù.
+    // ï¿½Ì¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¼ï¿½ï¿½Ð³ï¿½ï¿½Ô´Ï´ï¿½. 0ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ ï¿½Ð³ï¿½ï¿½ï¿½ ï¿½Ì¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     int get_minimum_year() const;
     std::vector<CourseTime> get_times() const;
     std::string get_name() const;
     std::string get_professor() const;
-    // ¼ö°­°¡´ÉÇÑ ºÎ¼­¸¦ ¾ò½À´Ï´Ù.
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Î¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.
     std::set<Department> get_departments() const;
     CourseType get_type() const;
-    // °­ÀÇ°¡ ¿­¸®´Â ÇÐ±âÀÔ´Ï´Ù.
+    // ï¿½ï¿½ï¿½Ç°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð±ï¿½ï¿½Ô´Ï´ï¿½.
     Semester get_semester() const;
-    // °­ÀÇ°¡ ¿­¸®´Â ¿¬µµÀÔ´Ï´Ù.
+    // ï¿½ï¿½ï¿½Ç°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.
     int get_year() const;
     bool is_english_a() const;
 
