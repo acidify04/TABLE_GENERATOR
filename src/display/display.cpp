@@ -1,333 +1,176 @@
 #include "display.h"
+#include "course.h"
 #include "course_db.h"
+#include "display_helper.h"
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <unordered_set>
 #include <map>
+#include <unordered_set>
 
 using namespace std;
 
 vector<Schedule *> schedules;
 CourseDatabase courseDb;
 
-Display::Display(
-    CourseDatabase& courseDatabase,
-    TableDatabase& tableDatabase,
-    TableGenerator& tableGenerator)
-    :
-    courseDatabase(courseDatabase), tableDatabase(tableDatabase), tableGenerator(tableGenerator)
+Display::Display(CourseDatabase &courseDatabase, TableDatabase &tableDatabase, TableGenerator &tableGenerator)
+    : courseDatabase(courseDatabase), tableDatabase(tableDatabase), tableGenerator(tableGenerator)
 {
-
 }
 
 void Display::display()
 {
-    // ø‰¿œ∞˙ Ω√∞£ø° µ˚∂Û ∞≠¿«∏¶ ∏≈«Œ«“ ∏  (ø‰¿œ∫∞∑Œ Ω√∞£ ∏≈«Œ)
-    std::map<Weekday, std::map<Time, std::string>> schedule;
+    std::vector<ColumnItem> columns = {ColumnItem{"1"}, ColumnItem{"2"}, ColumnItem{"3"}, ColumnItem{"4"},
+                                       ColumnItem{"5"}, ColumnItem{"6"}, ColumnItem{"7"}, ColumnItem{"8"},
+                                       ColumnItem{"9"}, ColumnItem{"10"}};
 
-    vector<Course> courseList = table->get_course();
-
-    // ø‰¿œ¿ª πÆ¿⁄ø≠∑Œ ∫Ø»Ø«œ±‚ ¿ß«— πËø≠
-    std::vector<std::string> daysOfWeek = {"Mon", "Tue", "Wed", "Thu", "Fri"};
-
-    // ∞≠¿« µ•¿Ã≈Õ∏¶ ∏ ø° √ﬂ∞°
-    for (const auto &course : courseList)
+    std::map<Weekday, RowItem> rows;
+    rows[Weekday::Sun] = RowItem{"Sun", std::vector<std::string>(10, "")};
+    rows[Weekday::Mon] = RowItem{"Mon", std::vector<std::string>(10, "")};
+    rows[Weekday::Tue] = RowItem{"Tue", std::vector<std::string>(10, "")};
+    rows[Weekday::Wed] = RowItem{"Wed", std::vector<std::string>(10, "")};
+    rows[Weekday::Thu] = RowItem{"Thu", std::vector<std::string>(10, "")};
+    rows[Weekday::Fri] = RowItem{"Fri", std::vector<std::string>(10, "")};
+    rows[Weekday::Sat] = RowItem{"Sat", std::vector<std::string>(10, "")};
+    for (const auto &course : table->get_course())
     {
-        for (const auto &courseTime : course.get_times())
+        for (const auto &time : course.get_times())
         {
-            Weekday weekday = courseTime.weekday;
-            Time time = courseTime.time;
-            schedule[weekday][time] = course.get_name(); // ø‰¿œ∞˙ Ω√∞£∫∞∑Œ ∞≠¿« ¿Ã∏ß ¿˙¿Â
+            rows[time.weekday].columns[time.time - 1] = course.get_name();
         }
     }
-
-    // Ω√∞£«• √‚∑¬
-    std::cout << "====================================================================================================="
-                 "=================\n";
-    std::cout << "Schedule:\n";
-
-    // «Ï¥ı √‚∑¬
-    std::cout << "Time ";
-    for (size_t i = 0; i < daysOfWeek.size(); ++i) // Mon~Fri∏∏ √‚∑¬
-    {
-        std::cout << std::setw(30) << daysOfWeek[i];
-    }
-    std::cout << '\n';
-    std::cout << "====================================================================================================="
-                 "=================\n";
-
-    // Ω√∞£ ¥‹¿ß∑Œ √‚∑¬
-    for (Time time = 1; time <= 10; ++time) // Ω√∞£¿∫ 1∫Œ≈Õ 10±Ó¡ˆ ∞°¡§
-    {
-        std::cout << std::setw(4) << time << " "; // Ω√∞£ √‚∑¬
-
-        for (size_t i = 0; i < daysOfWeek.size(); ++i) // Mon~Fri∏∏ √‚∑¬
-        {
-            Weekday weekday = static_cast<Weekday>(i);
-
-            if (schedule[weekday].count(time)) // ∆Ø¡§ Ω√∞£ø° ∞≠¿«∞° ¿÷¥¬ ∞ÊøÏ
-            {
-                std::cout << std::setw(30) << schedule[weekday][time];
-            }
-            else // ∞≠¿«∞° æ¯¥¬ ∞ÊøÏ ∞¯πÈ √‚∑¬
-            {
-                std::cout << std::setw(30) << " ";
-            }
-        }
-        std::cout << '\n';
-    }
-
-    std::cout << "====================================================================================================="
-                 "=================\n";
-
-    int input;
-    std::cin >> input;
+    draw_table("Timetable", columns,
+               {rows[Weekday::Sun], rows[Weekday::Mon], rows[Weekday::Tue], rows[Weekday::Wed], rows[Weekday::Thu],
+                rows[Weekday::Fri], rows[Weekday::Sat]});
 }
-
 
 void Display::createSchedule()
 {
     system("cls");
     vector<Course> courses = courseDatabase.query({});
+    if (courses.empty())
+    {
+        get_input("No courses found in the database. Please check the database");
+        return;
+    }
+
     CourseQuery query;
 
     table = new Table();
 
-    int input;
-
-    if (courses.empty())
+    // ÎÖÑÎèÑ ÏÑ§Ï†ï
+    std::optional<int> selected_year;
+    do
     {
-        cout << "No courses found in the database. Please check the database." << endl;
-        return;
-    }
+        selected_year = select_one(
+            std::vector<int>{2024}, [](int item) { return std::to_string(item); }, "Enter the year for the schedule.");
+    } while (!selected_year.has_value());
 
-    cout << "Enter the year for the schedule (e.g., 2023, 2024): ";
-    cin >> input;
-    table->set_year(input);
-    query.year = input;
+    if (selected_year.has_value())
+        query.year = selected_year.value();
     query.user_year = user.year;
-    cin.ignore();
-    system("cls");
 
-    cout << "You are currently in year " << user.year << " (as set in User Setup). Press Enter to continue...";
-    cin.ignore();
     system("cls");
+    std::string year_alert = "You are currently in year " + std::to_string(user.year) +
+                             " (as set in User Setup). Press Enter to continue...";
 
-    while (true)
+    // ÌïôÍ∏∞ ÏÑ§Ï†ï
+    std::optional<Semester> selected_semester;
+    do
     {
-        cout << "Select a semester:\n1. Spring\n2. Summer\n3. Fall\n4. Winter\nSelect: ";
-        cin >> input;
-        cin.ignore();
-        if (input >= 1 && input <= 4)
-        {
-            break;
-        }
-        else
-        {
-            cout << "Invalid choice. Please select a number between 1 and 4." << endl;
-        }
-    }
-    switch (input)
-    {
-    case 1:
-        table->set_semester(Semester::Spring);
-        query.semester = Semester::Spring;
-        break;
-    case 2:
-        table->set_semester(Semester::Summer);
-        query.semester = Semester::Summer;
-        break;
-    case 3:
-        table->set_semester(Semester::Fall);
-        query.semester = Semester::Fall;
-        break;
-    case 4:
-        table->set_semester(Semester::Winter);
-        query.semester = Semester::Winter;
-        break;
-    }
+        selected_semester = select_one(
+            std::vector<Semester>{Semester::Spring, Semester::Summer, Semester::Fall, Semester::Winter},
+            [](Semester item) {
+                switch (item)
+                {
+                case Semester::Spring:
+                    return "Spring";
+                case Semester::Summer:
+                    return "Summer";
+                case Semester::Fall:
+                    return "Fall";
+                case Semester::Winter:
+                    return "Winter";
+                }
+            },
+            "Select a semester");
+    } while (!selected_semester.has_value());
+    if (selected_semester.has_value())
+        query.semester = selected_semester.value();
 
-    system("cls");
+    // Î∂ÄÏÑú ÏÑ§Ï†ï
+    query.departments = {user.department};
 
-   /* set<string> departments;
-
+    // ÍµêÏàò ÏÑ§Ï†ï
+    std::vector<std::string> professor_list = {};
+    std::set<std::string> professor_set = {};
     for (const auto &course : courses)
     {
-        for (const auto &dept : course.get_departments())
+        if (professor_set.count(course.get_professor()) == 0)
         {
-            departments.insert(static_cast<string>(encode_department(dept)));
+            professor_list.push_back(course.get_professor());
+            professor_set.insert(course.get_professor());
         }
     }
+    std::vector<std::string> selected_professors = {};
+    selected_professors = select_multiple(
+        professor_list, [](std::string item) { return item; }, 10,
+        "Select a preferred professor. You can add multiple professor.");
+    query.professors.insert(selected_professors.begin(), selected_professors.end());
 
-    if (departments.empty())
-    {
-        cout << "No departments found. Please check the course data." << endl;
-        return;
-    }
-
-    vector<string> departmentList(departments.begin(), departments.end());
-
-    while (true)
-    {
-        cout << "Select a department: " << endl;
-        int idx = 1;
-        for (const auto &dept : departmentList)
-        {
-            cout << idx++ << ". ComputerScience" << endl;
-        }
-
-        cin >> input;
-        cin.ignore();
-        if (input >= 1 && input <= departmentList.size())
-        {
-            break;
-        }
-        else
-        {
-            cout << "Invalid choice. Please select a valid department number." << endl;
-        }
-    }*/  // ¿œ¥‹ º“«¡∆Æø˛æÓ«–∫Œ∏∏
-
-    query.departments.insert(Department::ComputerScience);
-
-    cout << "Select a preferred professor. You can add multiple professor. press -1 to exit";
-
-    int index = 1;
-    set<string> professorList;
-
-    for (const auto &course : courses)
-    {
-        professorList.insert(course.get_professor());
-    }
-
-    for (const auto &professor : professorList)
-    {
-        cout << index++ << "." << professor << '\n';
-    }
-
-    while (true)
-    {
-        cin >> input;
-
-        if (input == -1)
-        {
-            break;
-        }
-
-        if (input >= 1 && input <= professorList.size())
-        {
-            auto it = professorList.begin();
-            advance(it, input - 1);       // ¿Œµ¶Ω∫∏¶ 1-basedø°º≠ 0-based∑Œ ¡∂¡§
-            query.professors.insert(*it); // ±≥ºˆ ¿Ã∏ß¿ª º±≈√µ» ±≥ºˆ ∏Ò∑œø° √ﬂ∞°
-        }
-        else
-        {
-            cout << "Invalid selection. Please try again." << endl;
-        }
-
-        cout << "Would you like to select another professor? (Press -1 to finish): ";
-    }
-
-    cout << "Please select the day(s) you prefer for a free period. \n";
-
-    cout << "1. Monday \n";
-    cout << "2. Tuesday \n";
-    cout << "3. Wednesday \n";
-    cout << "4. Thrusday \n";
-    cout << "5. Friday \n";
-    cout << "6. None \n";
-
-    while (true)
-    {
-        cin >> input;
-
-        if (input < 1 && input > 6)
-            cout << "Invalid Choice! \n";
-        else
-            break;
-    }
-
-    switch (input)
-    {
-    case 1:
-        for (int i = 1; i < 6; i++)
-        {
-            Weekday day = static_cast<Weekday>(i);
-            if (day != Weekday::Mon)
+    // ÏöîÏùº ÏÑ§Ï†ï
+    std::vector<Weekday> selected_weekdays = select_multiple(
+        std::vector<Weekday>{Weekday::Sun, Weekday::Mon, Weekday::Tue, Weekday::Wed, Weekday::Thu, Weekday::Fri,
+                             Weekday::Sat},
+        [](Weekday item) {
+            switch (item)
             {
-                query.weekdays.insert(day);
+            case Weekday::Sun:
+                return "Sun";
+            case Weekday::Mon:
+                return "Mon";
+            case Weekday::Tue:
+                return "Tue";
+            case Weekday::Wed:
+                return "Wed";
+            case Weekday::Thu:
+                return "Thu";
+            case Weekday::Fri:
+                return "Fri";
+            case Weekday::Sat:
+                return "Sat";
             }
-        }
-        break;
-    case 2:
-        for (int i = 1; i < 6; i++)
-        {
-            Weekday day = static_cast<Weekday>(i);
-            if (day != Weekday::Tue)
-            {
-                query.weekdays.insert(day);
-            }
-        }
-        break;
-    case 3:
-        for (int i = 1; i < 6; i++)
-        {
-            Weekday day = static_cast<Weekday>(i);
-            if (day != Weekday::Wed)
-            {
-                query.weekdays.insert(day);
-            }
-        }
-        break;
-    case 4:
-        for (int i = 1; i < 6; i++)
-        {
-            Weekday day = static_cast<Weekday>(i);
-            if (day != Weekday::Thu)
-            {
-                query.weekdays.insert(day);
-            }
-        }
-        break;
-    case 5:
-        for (int i = 1; i < 6; i++)
-        {
-            Weekday day = static_cast<Weekday>(i);
-            if (day != Weekday::Fri)
-            {
-                query.weekdays.insert(day);
-            }
-        }
-        break;
-    default:
-        break;
-    }
+        },
+        7, "Select the day(s) you prefer.");
+    query.weekdays.insert(selected_weekdays.begin(), selected_weekdays.end());
 
-    cout << "total credit? \n";
-    cin >> input;
+    int selected_credit;
+    do
+    {
+        system("cls");
+        selected_credit = get_integer_input("Total credit? (Max 23)");
+    } while (selected_credit < 1 || selected_credit > 23);
 
-    tableGenerator.setTotalGrade(input);
+    tableGenerator.setTotalGrade(selected_credit);
     tableGenerator.setQuery(query);
     tableGenerator.generateTable(*table);
 
     display();
-
 }
 
 void Display::searchAll()
 {
     CourseQuery query;
     query.user_year = 0;
-    query.departments.insert(Department::ComputerScience);
+    query.departments = {user.department};
     vector<Course> courseList = courseDatabase.query(query);
 
-    std::cout << std::left // øﬁ¬  ¡§∑ƒ
-              << std::setw(15) << "∞˙∏Ò ƒ⁄µÂ" << std::setw(50) << "∞˙∏Ò∏Ì" << std::setw(20) << "¥„¥Á ±≥ºˆ"
+    std::cout << std::left // ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ
+              << std::setw(15) << "ÔøΩÔøΩÔøΩÔøΩ ÔøΩ⁄µÔøΩ" << std::setw(50) << "ÔøΩÔøΩÔøΩÔøΩÔøΩ" << std::setw(20) << "ÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ"
               << "\n";
-    std::cout << std::string(65, '-') << "\n"; // ±∏∫–º±
+    std::cout << std::string(65, '-') << "\n"; // ÔøΩÔøΩÔøΩ–ºÔøΩ
 
-    // ∞¢ ∞˙∏Ò ¡§∫∏ √‚∑¬
+    // ÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩ
     for (const Course &course : courseList)
     {
         std::cout << std::left << std::setw(15) << course.get_id() << std::setw(50) << course.get_name()
@@ -347,21 +190,21 @@ void Display::searchCourse()
     query.user_year = 0;
     query.departments.insert(Department::ComputerScience);
 
-    // º±≈√ « µÂ ¿‘∑¬
+    // ÔøΩÔøΩÔøΩÔøΩ ÔøΩ µÔøΩ ÔøΩ‘∑ÔøΩ
     std::cout << "Enter course name (or leave blank): ";
-    std::cin.ignore(); // πˆ∆€ ∫ÒøÏ±‚
+    std::cin.ignore(); // ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ
     std::getline(std::cin, query.name);
 
-    query.name = "º“∞¯";
+    query.name = "ÔøΩ“∞ÔøΩ";
 
     vector<Course> courseList = courseDatabase.query(query);
 
-    std::cout << std::left // øﬁ¬  ¡§∑ƒ
-              << std::setw(15) << "∞˙∏Ò ƒ⁄µÂ" << std::setw(50) << "∞˙∏Ò∏Ì" << std::setw(20) << "¥„¥Á ±≥ºˆ"
+    std::cout << std::left // ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ
+              << std::setw(15) << "ÔøΩÔøΩÔøΩÔøΩ ÔøΩ⁄µÔøΩ" << std::setw(50) << "ÔøΩÔøΩÔøΩÔøΩÔøΩ" << std::setw(20) << "ÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ"
               << "\n";
-    std::cout << std::string(65, '-') << "\n"; // ±∏∫–º±
+    std::cout << std::string(65, '-') << "\n"; // ÔøΩÔøΩÔøΩ–ºÔøΩ
 
-    // ∞¢ ∞˙∏Ò ¡§∫∏ √‚∑¬
+    // ÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩ
     for (const Course &course : courseList)
     {
         std::cout << std::left << std::setw(15) << course.get_id() << std::setw(50) << course.get_name()
@@ -376,75 +219,82 @@ void Display::searchCourse()
 void Display::setupUser()
 {
     system("cls");
-    cout << "Enter user name: ";
-    cin >> user.name;
 
-    while (true)
+    user.name = get_input("Enter user name: ");
+    do
     {
-        cout << "Enter user year (1-4): ";
-        cin >> user.year;
-        if (user.year >= 1 && user.year <= 4)
-        {
-            break;
-        }
-        else
-        {
-            cout << "Invalid input. Please enter a number between 1 and 4." << endl;
-        }
-    }
+        user.year = get_integer_input("Enter user year (1-4): ");
+    } while (user.year < 1 || user.year > 4);
 
-    while (true)
+    do
     {
-        cout << "Enter user student ID (8-digit number): ";
-        cin >> user.student_id;
-        if (user.student_id >= 10000000 && user.student_id <= 99999999)
-        {
-            break;
-        }
-        else
-        {
-            cout << "Invalid input. Please enter an 8-digit number." << endl;
-        }
-    }
-    cout << "Enter user department: ";
-    cin >> user.department;
+        user.student_id = get_integer_input("Enter user student ID (8-digit number): ");
+    } while (user.student_id < 10000000 && user.student_id > 99999999);
 
-    cin.ignore();
+    std::vector<Department> selectable_departments = {Department::ComputerScience};
+    std::optional<Department> department = select_one(
+        selectable_departments,
+        [](Department item) {
+            switch (item)
+            {
+            case Department::ComputerScience:
+                return "Computer Science";
+            }
+        },
+        "Select department");
+    if (department)
+        user.department = department.value();
 }
 
 void Display::mainMenu()
 {
-    system("cls");
-    int choice;
-    Table table;
-
     while (true)
     {
-        system("cls");
-        cout << "[MainMenu]\n1. User Setup\n2. Create Schedule\n3. SearchAll\n4. SearchOne\nSelect: ";
-        cin >> choice;
-        cin.ignore();
-
-        switch (choice)
+        std::optional<int> choice = select_one(
+            std::vector<int>{1, 2, 3, 4, 5},
+            [](int menu) {
+                switch (menu)
+                {
+                case 1:
+                    return "User setup";
+                case 2:
+                    return "Create schedule";
+                case 3:
+                    return "Search all";
+                case 4:
+                    return "Search one";
+                case 5:
+                    return "Quit";
+                default:
+                    return "";
+                }
+            },
+            "Menu");
+        if (choice.has_value())
         {
-        case 1:
-            system("cls");
-            setupUser();
-            break;
-        case 2:
-            system("cls");
-            createSchedule();
-            break;
-        case 3:
-            system("cls");
-            searchAll();
-            break;
-        case 4:
-            system("cls");
-            searchCourse();
-            break;
-        default:
-            cout << "Please select a valid option." << endl;
+            switch (choice.value())
+            {
+            case 1:
+                system("cls");
+                setupUser();
+                break;
+            case 2:
+                system("cls");
+                createSchedule();
+                break;
+            case 3:
+                system("cls");
+                searchAll();
+                break;
+            case 4:
+                system("cls");
+                searchCourse();
+                break;
+            case 5:
+                return;
+            default:
+                cout << "Please select a valid option." << endl;
+            }
         }
     }
 }

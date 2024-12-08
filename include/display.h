@@ -21,20 +21,20 @@ struct User
     string name;
     int year;
     int student_id;
-    string department;
+    Department department;
 };
 
 extern User currentUser;
-extern vector<Schedule *> schedules;       // »ç¿ëÀÚ ½Ã°£Ç¥ ¸ñ·Ï
-extern vector<string> selectedProfessors;  // »ç¿ëÀÚ ¼±ÅÃ ±³¼ö ¸ñ·Ï
-extern bool isEnglishA;                    // »ç¿ëÀÚ ¿µ¾î A °ú¸ñ ¿©ºÎ
-extern int maxCredits;                     // »ç¿ëÀÚ ÃÖ´ë ÇÐÁ¡
-extern unordered_set<string> selectedDays; // »ç¿ëÀÚ ¼±ÅÃ ¿äÀÏ ¸ñ·Ï
+extern vector<Schedule *> schedules;       // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½Ç¥ ï¿½ï¿½ï¿½
+extern vector<string> selectedProfessors;  // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+extern bool isEnglishA;                    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ A ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+extern int maxCredits;                     // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½
+extern unordered_set<string> selectedDays; // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
 class Display
 {
   private:
-    // ÀÇÁ¸¼º ÁÖÀÔ
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     CourseDatabase courseDatabase;
     TableDatabase tableDatabase;
     TableGenerator tableGenerator;
