@@ -1,5 +1,5 @@
 #include "course_db.h"
-//#include "display.h"
+#include "display.h"
 //#include "schedule_management.h"
 //#include "table_generator.h"
 #include "table_db.h"
@@ -14,7 +14,7 @@ using namespace std;
 int main()
 {
     //std::cout << "Hello World!" << std::endl;
-    CourseDatabase courseDB;
+    /*CourseDatabase courseDB;
     courseDB.load();
     TableDatabase db;
     CourseQuery query = {Semester::Fall, 2024, 3, "", {}, {}, {}, {}};
@@ -28,7 +28,11 @@ int main()
     for (Course course : table.get_course())
     {
         cout << course.get_name() << endl;
-    }
+    }*/
+    CourseDatabase courseDB;
+    TableDatabase tableDB;
+    courseDB.load();
+    mainMenu();
     
     return 0;
 }
